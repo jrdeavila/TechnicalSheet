@@ -16,15 +16,15 @@ return new class extends Migration
             $table->morphs('technical_sheetable', 'technical_sheetable_index');
             $table->integer('user_id')->nullable();
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on(env('DB_TIMEIT_DATABASE') . '.usuarios')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
         });
-
-        DB::statement("ALTER TABLE `technical_sheets` ADD CONSTRAINT `technical_sheets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timeit`.`usuarios`(`id`) ON DELETE SET NULL ON UPDATE CASCADE");
     }
 
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE `technical_sheets` DROP FOREIGN KEY `technical_sheets_user_id_foreign`");
         Schema::dropIfExists('technical_sheets');
     }
 };

@@ -5,8 +5,6 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
@@ -35,6 +33,17 @@ class User extends Authenticatable
         'Empleados_id'
     ];
 
+
+    public function adminlte_image()
+    {
+        return $this->employee->curriculum->photo;
+    }
+
+    public function adminlte_desc()
+    {
+        return $this->employee->job->name;
+    }
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'Empleados_id');
@@ -44,8 +53,6 @@ class User extends Authenticatable
     {
         return $this->clave;
     }
-
-
 
     public function getEmailAttribute()
     {

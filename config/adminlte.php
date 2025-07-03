@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Ficha tecnica',
+    'title' => 'Mesa de ayuda',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b>Ficha</b>Tecnica',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => 'Ficha <b>Tecnica</b>',
+    'logo_img' => 'img/logos/white.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -84,11 +84,11 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'img/logos/default.png',
             'alt' => 'Auth Logo',
-            'class' => 'brand-image img-circle elevation-3',
+            'class' => '',
             'width' => 50,
             'height' => 50,
         ],
@@ -113,11 +113,11 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'AdminLTE Preloader Image',
+            'path' => 'img/logos/preloader.png',
+            'alt' => 'Camara de Comercio de Valledupar',
             'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'width' => 200,
+            'height' => 200,
         ],
     ],
 
@@ -137,8 +137,8 @@ return [
     'usermenu_header' => false,
     'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => true,
-    'usermenu_desc' => false,
-    'usermenu_profile_url' => true,
+    'usermenu_desc' => true,
+    'usermenu_profile_url' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -175,7 +175,7 @@ return [
     'classes_auth_header' => '',
     'classes_auth_body' => '',
     'classes_auth_footer' => '',
-    'classes_auth_icon' => 'avatar avatar-md bg-primary',
+    'classes_auth_icon' => '',
     'classes_auth_btn' => 'btn-flat btn-primary',
 
     /*
@@ -256,14 +256,14 @@ return [
     |
     */
 
-    'use_route_url' => true,
+    'use_route_url' => false,
     'dashboard_url' => 'home',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
     'password_email_url' => 'password/email',
-    'profile_url' => true,
+    'profile_url' => false,
     'disable_darkmode_routes' => false,
 
     /*
@@ -299,10 +299,15 @@ return [
     */
 
     'menu' => [
+        // Navbar items:
         [
+            'type' => 'navbar-search',
             'text' => 'search',
-            'search' => true,
-            'topnav' => true,
+            'topnav_right' => true,
+        ],
+        [
+            'type' => 'fullscreen-widget',
+            'topnav_right' => true,
         ],
         [
             'text' => 'Ficha tecnica',
@@ -319,7 +324,8 @@ return [
                     'icon' => 'fas fa-tachometer-alt',
                 ]
             ]
-        ]
+        ],
+
     ],
 
     /*
