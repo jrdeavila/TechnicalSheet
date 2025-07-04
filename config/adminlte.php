@@ -315,12 +315,12 @@ return [
             'submenu' => [
                 [
                     'text' => 'Registrar ficha tecnica',
-                    'url' => 'home',
+                    'route' => 'technicalSheet.create',
                     'icon' => 'fas fa-tachometer-alt',
                 ],
                 [
                     'text' => 'Listar',
-                    'url' => 'listar',
+                    'route' => 'technicalSheet.index',
                     'icon' => 'fas fa-tachometer-alt',
                 ]
             ]
