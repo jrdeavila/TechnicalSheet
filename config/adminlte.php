@@ -134,8 +134,8 @@ return [
     */
 
     'usermenu_enabled' => true,
-    'usermenu_header' => false,
-    'usermenu_header_class' => 'bg-primary',
+    'usermenu_header' => true,
+    'usermenu_header_class' => 'bg-white',
     'usermenu_image' => true,
     'usermenu_desc' => true,
     'usermenu_profile_url' => false,
@@ -193,12 +193,13 @@ return [
     'classes_body' => '',
     'classes_brand' => '',
     'classes_brand_text' => '',
-    'classes_content_wrapper' => '',
-    'classes_content_header' => '',
+    'classes_content_wrapper' => 'pt-5',
+    'classes_content_header' => 'mt-3',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'sidebar-dark-primary elevation-4 position-fixed',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-white navbar-light',
+    'classes_topnav' => 'navbar-white navbar-light position-fixed elevation-1',
+    'styles_topnav' => 'left: 0; right: 0;',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -317,11 +318,13 @@ return [
                     'text' => 'Registrar ficha tecnica',
                     'route' => 'technicalSheet.create',
                     'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'create-technical-sheet',
                 ],
                 [
                     'text' => 'Listar',
                     'route' => 'technicalSheet.index',
                     'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'list-technical-sheet',
                 ]
             ]
         ],
