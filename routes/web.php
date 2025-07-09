@@ -27,3 +27,4 @@ Route::middleware('auth')->group(function () {
         ->names('brand');
     Route::resource('users', UserController::class)->names('users');
 });
+
