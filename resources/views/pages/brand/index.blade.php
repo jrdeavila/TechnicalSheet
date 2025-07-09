@@ -28,10 +28,21 @@
             @endif
         </div>
         <div class="col-md-8">
-            <x-adminlte-card title="Marcas" theme="primary" icon="fas fa-clipboard-list">
+            <x-adminlte-card title="Marcas" theme="light" icon="fas fa-clipboard-list">
                 <x-slot name="toolsSlot">
-                    <x-adminlte-button class="btn-flat" theme="primary" icon="fas fa-plus" data-toggle="modal"
-                        data-target="#addBrandModal" label="Agregar Marca" />
+                    <div class="d-flex justify-content-between items-align-center">
+                        <form action="{{ route('brand.index') }}" method="GET" class="form-inline">
+                            <label for="limit" class="mr-2">Mostrar:</label>
+                            <x-adminlte-select name="limit" class="form-control" onchange="this.form.submit()">
+                                <option value="10" {{ request('limit') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('limit') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('limit') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('limit') == 100 ? 'selected' : '' }}>100</option>
+                            </x-adminlte-select>
+                        </form>
+                        <x-adminlte-button class="ml-2" theme="primary" icon="fas fa-plus" data-toggle="modal"
+                            data-target="#addBrandModal" label="Agregar Marca" />
+                    </div>
                 </x-slot>
                 <!-- Add Modal -->
                 <x-adminlte-modal id="addBrandModal" title="Agregar Nueva Marca" theme="primary" size="lg">
@@ -99,7 +110,7 @@
                 </x-adminlte-datatable>
 
             </x-adminlte-card>
-            {{ $brands->links('custom.pagination') }}
+            {{ $brands->withQueryString()->links('custom.pagination') }}
         </div>
     </div>
 @stop
