@@ -8,4 +8,5 @@ return [
     'Details' => 'Detalles',
     'Reports' => 'Reportes',
     'Technical Sheets' => 'Listado de Ficha Tecnica',
+    'Brands' => 'Marcas',
 ];

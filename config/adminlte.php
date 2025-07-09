@@ -156,7 +156,7 @@ return [
     'layout_boxed' => null,
     'layout_fixed_sidebar' => true,
     'layout_fixed_navbar' => true,
-    'layout_fixed_footer' => null,
+    'layout_fixed_footer' => true,
     'layout_dark_mode' => null,
 
     /*
@@ -196,10 +196,9 @@ return [
     'classes_content_wrapper' => 'pt-5',
     'classes_content_header' => 'mt-3',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4 position-fixed',
+    'classes_sidebar' => 'sidebar-dark-primary',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-white navbar-light position-fixed elevation-1',
-    'styles_topnav' => 'left: 0; right: 0;',
+    'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -325,9 +324,54 @@ return [
                     'route' => 'technicalSheet.index',
                     'icon' => 'fas fa-tachometer-alt',
                     'can' => 'list-technical-sheet',
-                ]
+                ],
+
             ]
         ],
+        [
+            'text' => 'Terminos y referencias',
+            'icon' => 'fas fa-briefcase',
+            'submenu' => [
+                [
+                    'text' => 'Marcas',
+                    'route' => 'brand.index',
+                    'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'list-brand',
+                ],
+                [
+                    'text' => 'Tipos de perifericos',
+                    'route' => 'peripheralType.index',
+                    'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'list-peripheral-type',
+                ],
+                [
+                    'text' => 'Caracteristicas',
+                    'route' => 'feature.index',
+                    'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'list-feature',
+                ],
+                [
+                    'text' => 'Sistemas operativos',
+                    'route' => 'operatingSystem.index',
+                    'icon' => 'fas fa-tachometer-alt',
+                    'can' => 'list-operating-system',
+                ],
+            ],
+
+        ],
+        [
+            'text' => 'Administración',
+            'icon' => 'fas fa-cogs',
+            'can' => 'technical-sheet-admin-access',
+            'submenu' => [
+                [
+                    'text' => 'Configuración de usuarios',
+                    'route' => 'users.index',
+                    'icon' => 'fas fa-users',
+                    'can' => 'users-admin-access',
+                ]
+            ]
+        ]
 
     ],
 
