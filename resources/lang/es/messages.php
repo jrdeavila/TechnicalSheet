@@ -12,4 +12,5 @@ return [
     'error' => 'Error',
     'warning' => 'Advertencia',
     'success' => 'Éxito',
+    'Peripheral Types' => 'Tipos de Perifericos',
 ];
