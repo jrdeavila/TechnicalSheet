@@ -30,7 +30,7 @@ class BrandController extends Controller
             $brand->save();
             return redirect()->route('brand.index')->with('success', 'La marca se ha actualizado correctamente');
         } catch (Exception $e) {
-            return redirect()->route('brand.index')->withError('Error al actualizar la marca');
+            return redirect()->route('brand.index')->with('warning', 'Error al actualizar la marca');
         }
     }
 
@@ -40,10 +40,12 @@ class BrandController extends Controller
             'name' => 'required|string|max:50|unique:' . Brand::class,
         ]);
         try {
-            Brand::create($request->all());
+            Brand::create([
+                'name' => $request->get('name'),
+            ]);
             return redirect()->route('brand.index')->with('success', 'La marca se ha creado correctamente');
         } catch (Exception $e) {
-            return redirect()->back()->withError('Error al crear la marca');
+            return redirect()->back()->with('warning', 'Error al crear la marca: ' . $e->getMessage());
         }
     }
 
@@ -53,7 +55,7 @@ class BrandController extends Controller
             $brand->delete();
             return redirect()->route('brand.index')->with('success', 'La marca se ha eliminado correctamente');
         } catch (Exception $e) {
-            return redirect()->back()->withError('Error al eliminar la marca');
+            return redirect()->back()->with('warning', 'Error al eliminar la marca');
         }
     }
 }

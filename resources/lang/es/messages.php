@@ -9,4 +9,7 @@ return [
     'Reports' => 'Reportes',
     'Technical Sheets' => 'Listado de Ficha Tecnica',
     'Brands' => 'Marcas',
+    'error' => 'Error',
+    'warning' => 'Advertencia',
+    'success' => 'Éxito',
 ];

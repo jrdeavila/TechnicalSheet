@@ -11,7 +11,7 @@
         <div class="col-md-8">
             @foreach (['success', 'error', 'warning'] as $messageType)
                 @if (session($messageType))
-                    <x-adminlte-alert theme="{{ $messageType }}" dismissable>
+                    <x-adminlte-alert title="{{ __('messages.' . $messageType) }}" theme="{{ $messageType }}" dismissable>
                         {{ session($messageType) }}
                     </x-adminlte-alert>
                 @endif
@@ -37,10 +37,8 @@
                 <x-adminlte-modal id="addBrandModal" title="Agregar Nueva Marca" theme="primary" size="lg">
                     <form action="{{ route('brand.store') }}" method="POST">
                         @csrf
-                        <div class="form-group">
-                            <label for="name">Nombre de la Marca</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
+                        <x-adminlte-input name="name" label="Nombre de la Marca"
+                            placeholder="Ingrese el nombre de la marca" required />
                         <div class="modal-footer">
                             <x-adminlte-button type="submit" class="btn btn-primary" label="Agregar Marca" />
                             <x-adminlte-button data-dismiss="modal" class="btn btn-secondary" label="Cancelar" />
@@ -67,25 +65,26 @@
                         <!-- Edit Modal -->
                         <x-adminlte-modal id="editBrandModal{{ $brand->id }}" title="Editar Marca: {{ $brand->name }}"
                             theme="primary" size="lg">
+                            <x-slot name="footerSlot">
+                                <p class="text-muted">Asegúrate de que el nombre de la marca sea único.</p>
+                            </x-slot>
                             <form action="{{ route('brand.update', $brand->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
-                                <div class="form-group">
-                                    <label for="name">Nombre de la Marca</label>
-                                    <input type="text" class="form-control" id="name" name="name"
-                                        value="{{ $brand->name }}" required>
-                                </div>
+                                <x-adminlte-input name="name" label="Nombre de la Marca" value="{{ $brand->name }}"
+                                    placeholder="Ingrese el nombre de la marca" required />
                                 <div class="modal-footer">
                                     <x-adminlte-button type="submit" class="btn btn-primary" label="Guardar Cambios" />
-                                    <x-adminlte-button data-dismiss="modal"
-                                        class="btn btn-secondary
-                                    " label="Cancelar" />
+                                    <x-adminlte-button data-dismiss="modal" class="btn btn-secondary" label="Cancelar" />
                                 </div>
                             </form>
                         </x-adminlte-modal>
                         <!-- Delete Modal -->
                         <x-adminlte-modal id="deleteBrandModal{{ $brand->id }}"
                             title="Eliminar Marca: {{ $brand->name }}" theme="danger" size="lg">
+                            <x-slot name="footerSlot">
+                                <p class="text-muted">Esta acción no se puede deshacer.</p>
+                            </x-slot>
                             <p>¿Estás seguro de que deseas eliminar la marca <strong>{{ $brand->name }}</strong>?</p>
                             <form action="{{ route('brand.destroy', $brand->id) }}" method="POST">
                                 @csrf
@@ -100,6 +99,7 @@
                 </x-adminlte-datatable>
 
             </x-adminlte-card>
+            {{ $brands->links('custom.pagination') }}
         </div>
     </div>
 @stop
