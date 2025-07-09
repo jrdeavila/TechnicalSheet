@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateTechnicalSheetRequest;
 use App\Http\Requests\UpdateTechnicalSheetRequest;
+use App\Models\Brand;
+use App\Models\Feature;
+use App\Models\PeripheralType;
 use App\Models\TechnicalSheet;
 use Exception;
 use Illuminate\Http\Request;
@@ -11,8 +14,22 @@ use Illuminate\Support\Facades\DB;
 
 class TechnicalSheetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $type = $request->get('type');
+
+        if ($type == 'pcs') {
+            return view('pages.technicalSheet.views_2.pcs');
+        }
+        if ($type == 'printers') {
+            return view('pages.technicalSheet.views_2.printers');
+        }
+
+        if ($type == 'scanners') {
+            return view('pages.technicalSheet.views_2.scanners');
+        }
+        return view('pages.technicalSheet.index');
+
         $technicalSheets = TechnicalSheet::paginate(5);
         return view('pages.technicalSheet.index', compact('technicalSheets'));
     }
@@ -22,8 +39,23 @@ class TechnicalSheetController extends Controller
         return view('pages.technicalSheet.show', compact('technicalSheet'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $type = $request->get('type');
+        $features = Feature::all();
+
+        if ($type == 'pc') {
+            $peripheralTypes = PeripheralType::all();
+            $brands = Brand::all();
+            return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'features'));
+        }
+        if ($type == 'printer') {
+            return view('pages.technicalSheet.views.printer');
+        }
+
+        if ($type == 'scanner') {
+            return view('pages.technicalSheet.views.scanner');
+        }
         return view('pages.technicalSheet.create');
     }
 

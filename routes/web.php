@@ -15,3 +15,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::resource('technical-sheets', TechnicalSheetController::class)->names('technicalSheet');
 });
+
