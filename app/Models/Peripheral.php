@@ -20,6 +20,8 @@ class Peripheral extends Model
         'peripheralable_id',
     ];
 
+    public $with = ['peripheralType', 'brand'];
+
     public function peripherable(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'peripheralable_type', 'peripheralable_id');

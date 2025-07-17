@@ -16,6 +16,8 @@ class Computer extends Model
         'operation_system_id'
     ];
 
+    public $with = ['operation_system', 'peripherals', 'featureValues'];
+
     public function operation_system(): BelongsTo
     {
         return $this->belongsTo(OperationSystem::class);

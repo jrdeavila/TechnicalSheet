@@ -13,6 +13,7 @@ return [
     'before' => 'El campo :attribute debe ser una fecha anterior a :date.',
     'exists' => 'El campo :attribute no existe.',
     'array' => 'El campo :attribute debe ser una lista de elementos.',
+    'required_if' => 'El campo :attribute es requerido cuando :other es :value.',
 
     'attributes' => [
         'name' => 'Nombre',

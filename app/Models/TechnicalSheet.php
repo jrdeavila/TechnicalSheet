@@ -17,6 +17,11 @@ class TechnicalSheet extends Model
         'technical_sheetable_type',
     ];
 
+    public $with = [
+        'user',
+        'technicalSheetable',
+    ];
+
     public function technicalSheetable(): MorphTo
     {
         return $this->morphTo();

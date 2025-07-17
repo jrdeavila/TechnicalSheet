@@ -19,6 +19,8 @@ class FeatureValue extends Model
         'value',
     ];
 
+    public $with = ['feature'];
+
     public function feature()
     {
         return $this->belongsTo(Feature::class);
