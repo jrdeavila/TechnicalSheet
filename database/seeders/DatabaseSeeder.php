@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             PeripheralSeeder::class,
             FeatureSeeder::class,
+            OperatingSystemSeeder::class
         ]);
     }
 }

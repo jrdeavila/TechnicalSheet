@@ -11,9 +11,6 @@ return new class extends Migration
     {
         Schema::create('printers', function (Blueprint $table) {
             $table->id();
-            $table->integer('toner');
-            $table->boolean('ink');
-            $table->boolean('in_network');
             $table->timestamps();
         });
     }

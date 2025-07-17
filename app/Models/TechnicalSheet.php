@@ -13,6 +13,8 @@ class TechnicalSheet extends Model
 
     protected $fillable = [
         'user_id',
+        'technical_sheetable_id',
+        'technical_sheetable_type',
     ];
 
     public function technicalSheetable(): MorphTo

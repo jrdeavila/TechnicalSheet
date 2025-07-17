@@ -21,6 +21,7 @@ return new class extends Migration
                 ->constrained('peripheral_types')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->morphs('peripheralable');
             $table->timestamps();
         });
     }

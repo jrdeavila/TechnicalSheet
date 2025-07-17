@@ -8,162 +8,276 @@
 
 @section('content')
     <div x-data="data()">
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-12">
+                @foreach (['success', 'error', 'warning'] as $messageType)
+                    @if (session($messageType))
+                        <x-adminlte-alert theme="{{ $messageType }}" title="{{ __('messages.' . $messageType) }}">
+                            {{ session($messageType) }}
+                        </x-adminlte-alert>
+                    @endif
+                @endforeach
 
-        <form action="{{ route('technicalSheet.store') }}">
-            <div class="row justify-content-center mt-4">
-                <div class="col-md-4">
-                    <x-adminlte-card title="Crear Ficha Tecnica de Computadora" theme="primary" icon="fas fa-desktop">
-                        <form action="{{ route('technicalSheet.store') }}" method="POST">
-                            @csrf
+                @if ($errors->any())
+                    <x-adminlte-alert theme="danger" title="Error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </x-adminlte-alert>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <x-adminlte-card title="Crear Ficha Tecnica de Computadora" theme="primary" icon="fas fa-desktop">
+                    <form action="{{ route('technicalSheet.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="peripherals[]" :value="peripheralsStr">
+                        <input type="hidden" name="features[]" :value="newFeaturesStr">
+                        <input type="hidden" name="type" value="pc">
 
-                            <input type="hidden" name="type" value="pc">
-                            <x-adminlte-select name="brand_id" label="Marca">
-                                @foreach ($brands as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                @endforeach
-                            </x-adminlte-select>
+                        <x-adminlte-select name="brand_id" label="Marca">
+                            @foreach ($brands as $brand)
+                                <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->name }}</option>
+                            @endforeach
+                        </x-adminlte-select>
 
-                            <input type="hidden" name="peripherals[]" x-model="pheripherals">
 
-                            <x-adminlte-input name="name" label="Nombre del Equipo"
-                                placeholder="Ingrese el nombre del equipo" />
-                            <x-adminlte-input name="model" label="Modelo" placeholder="Ingrese el modelo" />
-                            <x-adminlte-input name="serial_number" label="Numero de serie"
-                                placeholder="Ingrese el numero de serie" />
-                            <x-adminlte-input name="state" label="Estado" placeholder="Ingrese el estado" />
-                            <x-adminlte-input name="operating_system" label="Sistema Operativo"
-                                placeholder="Ingrese el sistema operativo" />
-                            <div class="row justify-content-center">
-                                <x-adminlte-button type="submit" label="Guardar" theme="primary" icon="fas fa-save" />
-                            </div>
+                        <x-adminlte-input name="model" label="Modelo" placeholder="Ingrese el modelo"
+                            value="{{ old('model') }}" />
+                        <x-adminlte-input name="serial_number" label="Numero de serie"
+                            placeholder="Ingrese el numero de serie" value="{{ old('serial_number') }}" />
+                        <x-adminlte-select name="operation_system_id" label="Sistema Operativo">
+                            @foreach ($operatingSystems as $operatingSystem)
+                                <option value="{{ $operatingSystem->id }}"
+                                    {{ old('operation_system_id') == $operatingSystem->id ? 'selected' : '' }}>
+                                    {{ $operatingSystem->name }}</option>
+                            @endforeach
+                        </x-adminlte-select>
+                        <x-adminlte-button type="submit" label="Guardar" theme="primary" icon="fas fa-save" />
+                    </form>
+                </x-adminlte-card>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <x-adminlte-card title="Perifericos" theme="secondary" icon="fas fa-mouse">
+                            <form @submit.prevent="addperipheral">
+                                <x-adminlte-select name="peripheral_type_id" label="Tipo de Periferico">
+                                    @foreach ($peripheralTypes as $peripheralType)
+                                        <option value="{{ $peripheralType->id }}">{{ $peripheralType->name }}</option>
+                                    @endforeach
+                                </x-adminlte-select>
 
-                        </form>
-                    </x-adminlte-card>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
-                        <div x-show="pheripherals.length > 0" class="col-md-12">
-                            <x-adminlte-card title="Perifericos Agregados" theme="info" icon="fas fa-list">
-                                <x-adminlte-datatable id="pheripheralTable" :heads="['Tipo', 'Marca', 'Modelo', 'Numero de Serie', 'Acciones']" :config="[
-                                    'searching' => false,
-                                    'paging' => false,
-                                    'info' => false,
-                                ]">
-                                    <template x-for="pheripheral in pheripherals" :key="pheripheral.serial_number">
-                                        <tr>
-                                            <td x-text="peripheralTypes.find(pt => pt.id == pheripheral.type_id).name">
-                                            </td>
-                                            <td x-text="brands.find(b => b.id == pheripheral.brand_id).name"></td>
-                                            <td x-text="pheripheral.model"></td>
-                                            <td x-text="pheripheral.serial_number"></td>
-                                            <td>
-                                                <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
-                                                    @click="removePheripheral(pheripheral.serial_number)" />
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </x-adminlte-datatable>
-                            </x-adminlte-card>
-                        </div>  
+                                <x-adminlte-select name="peripheral_brand_id" label="Marca">
+                                    @foreach ($brands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                    @endforeach
+                                </x-adminlte-select>
 
-                        <div class="col-md-12">
-                            <x-adminlte-card title="Perifericos" theme="primary" icon="fas fa-mouse">
-                                <form @submit.prevent="addPheripheral">
-                                    <x-adminlte-select name="pheripheral_type_id" label="Tipo de Periferico">
-                                        @foreach ($peripheralTypes as $peripheralType)
-                                            <option value="{{ $peripheralType->id }}">{{ $peripheralType->name }}</option>
-                                        @endforeach
-                                    </x-adminlte-select>
+                                <x-adminlte-input name="peripheral_model" label="Modelo"
+                                    placeholder="Ingrese el modelo del periferico" />
+                                <x-adminlte-input name="peripheral_serial_number" label="Numero de serie"
+                                    placeholder="Ingrese el numero de serie del periferico" />
 
-                                    <x-adminlte-select name="pheripheral_brand_id" label="Marca">
-                                        @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                        @endforeach
-                                    </x-adminlte-select>
-
-                                    <x-adminlte-input name="pheripheral_model" label="Modelo"
-                                        placeholder="Ingrese el modelo del periferico" />
-                                    <x-adminlte-input name="pheripheral_serial_number" label="Numero de serie"
-                                        placeholder="Ingrese el numero de serie del periferico" />
-
-                                    <x-adminlte-button type="submit" label="Agregar Periferico" theme="success"
-                                        icon="fas fa-plus" />
-                                </form>
-                            </x-adminlte-card>
-                        </div>
+                                <x-adminlte-button type="submit" label="Agregar Periferico" theme="success"
+                                    icon="fas fa-plus" />
+                            </form>
+                        </x-adminlte-card>
                     </div>
+                    <div x-show="peripherals.length > 0" class="col-md-12">
+                        <x-adminlte-card title="Perifericos Agregados" theme="info" icon="fas fa-list">
+                            <x-adminlte-datatable id="peripheralTable" :heads="['Tipo', 'Marca', 'Modelo', 'Numero de Serie', 'Acciones']" :config="[
+                                'searching' => false,
+                                'paging' => false,
+                                'info' => false,
+                            ]">
+                                <template x-for="peripheral in peripherals" :key="peripheral.serial_number">
+                                    <tr>
+                                        <td x-text="peripheralTypes.find(pt => pt.id == peripheral.type_id).name">
+                                        </td>
+                                        <td x-text="brands.find(b => b.id == peripheral.brand_id).name"></td>
+                                        <td x-text="peripheral.model"></td>
+                                        <td x-text="peripheral.serial_number"></td>
+                                        <td>
+                                            <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
+                                                @click="removeperipheral(peripheral.serial_number)" />
+                                        </td>
+                                    </tr>
+                                </template>
+                            </x-adminlte-datatable>
+                        </x-adminlte-card>
+                    </div>
+
+
                 </div>
-                <div class="col-md-4">
-                    <x-adminlte-card title="Caracteristicas del Equipo" theme="secondary" icon="fas fa-cogs">
-                        <form @submit.prevent="addFeature">
-                            @csrf
-                            <input type="hidden" name="type" value="pc">
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <x-adminlte-card title="Caracteristicas del Equipo" theme="secondary" icon="fas fa-cogs">
+                            <form @submit.prevent="addFeature">
+                                @csrf
+                                <input type="hidden" name="type" value="pc">
 
-                            <x-adminlte-select name="feature_id" label="Caracteristicas" x-model="selectFeature">
-                                @foreach ($features as $feature)
-                                    <option value="{{ $feature->id }}">{{ $feature->name }}</option>
-                                @endforeach
-                            </x-adminlte-select>
+                                <x-adminlte-select name="feature_id" label="Caracteristicas">
+                                    @foreach ($features as $feature)
+                                        <option value="{{ $feature->id }}">{{ $feature->name }}</option>
+                                    @endforeach
+                                </x-adminlte-select>
 
-                            <x-adminlte-input name="feature_value" label="Valor de la Caracteristica"
-                                placeholder="Ingrese el valor de la caracteristica" />
+                                <x-adminlte-input name="feature_value" label="Valor de la Caracteristica"
+                                    placeholder="Ingrese el valor de la caracteristica" />
 
 
-                            <div class="row justify-content-center">
                                 <x-adminlte-button type="submit" label="Agregar Caracteristicas" theme="success"
                                     icon="fas fa-plus" />
-                            </div>
-                    </x-adminlte-card>
+                        </x-adminlte-card>
+                    </div>
+                    <div x-show="newFeatures.length > 0" class="col-md-12">
+                        <x-adminlte-card title="Caracteristicas Agregadas" theme="info" icon="fas fa-list">
+                            <x-adminlte-datatable id="featureTable" :heads="['Caracteristica', 'Valor', 'Acciones']" :config="[
+                                'searching' => false,
+                                'paging' => false,
+                                'info' => false,
+                            ]">
+                                <template x-for="feature in newFeatures" :key="feature.feature_id">
+                                    <tr>
+                                        <td x-text="fetures.find(f => f.id == feature.feature_id).name"></td>
+                                        <td x-text="feature.value"></td>
+                                        <td>
+                                            <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
+                                                @click="removeFeature(feature.feature_id)" />
+                                        </td>
+                                    </tr>
+                                </template>
+                            </x-adminlte-datatable>
+                        </x-adminlte-card>
+                    </div>
+
                 </div>
 
             </div>
-        </form>
+
+        </div>
 
     </div>
 
 @endsection
 
+@section('css')
+    {{-- Sweetalert --}}
+    <link rel="stylesheet" href="{{ asset('vendor/sweetalert2/sweetalert2.css') }}">
+@endsection
+
+
 @section('js')
+    {{-- Sweetalert --}}
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.js') }}"></script>
+    {{-- Alpine --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
+        const alert2 = (title, text, icon) => {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                confirmButtonText: 'Aceptar'
+            });
+        };
+
         function data() {
+            const peripherals = JSON.parse(@json(old('peripherals') ?? '[]'));
+            const newFeatures = JSON.parse(@json(old('features') ?? '[]'));
             return {
                 brands: @json($brands),
                 peripheralTypes: @json($peripheralTypes),
-                pheripherals: [],
-                removePheripheral(serialNumber) {
-                    this.pheripherals = this.pheripherals.filter(p => p.serial_number !== serialNumber);
+                peripherals,
+                peripheralsStr: JSON.stringify(peripherals),
+                fetures: @json($features),
+                newFeaturesStr: JSON.stringify(newFeatures),
+                newFeatures,
+                removeFeature(featureId) {
+                    this.newFeatures = this.newFeatures.filter(f => f.feature_id !== featureId);
+                    this.newFeaturesJson = JSON.stringify(this.newFeatures);
                 },
-                addPheripheral(e) {
+                addFeature(e) {
                     e.preventDefault();
-                    const pheripheralTypeId = document.querySelector('select[name="pheripheral_type_id"]').value;
-                    const pheripheralBrandId = document.querySelector('select[name="pheripheral_brand_id"]').value;
-                    const pheripheralModel = document.querySelector('input[name="pheripheral_model"]').value;
-                    const pheripheralSerialNumber = document.querySelector('input[name="pheripheral_serial_number"]')
-                        .value;
+                    const featureId = document.querySelector('select[name="feature_id"]').value;
+                    const featureValue = document.querySelector('input[name="feature_value"]').value;
 
-                    const pheripheral = {
-                        type_id: pheripheralTypeId,
-                        brand_id: pheripheralBrandId,
-                        model: pheripheralModel,
-                        serial_number: pheripheralSerialNumber
+                    const feature = {
+                        feature_id: featureId,
+                        value: featureValue
                     };
 
-                    if (this.pheripherals.some(p => p.serial_number === pheripheral.serial_number)) {
-                        alert('El periferico con este numero de serie ya ha sido agregado.');
+                    if (!feature.feature_id) {
+                        alert2('Error', 'La caracteristica es obligatoria.', 'error');
                         return;
-                    } else {
-                        this.pheripherals.push(pheripheral);
-                        document.querySelector('input[name="pheripheral_model"]').value = '';
-                        document.querySelector('input[name="pheripheral_serial_number"]').value = '';
                     }
 
+                    if (!feature.value) {
+                        alert2('Error', 'El valor de la caracteristica es obligatorio.', 'error');
+                        return;
+                    }
+
+                    if (this.newFeatures.some(f => f.feature_id === feature.feature_id)) {
+                        alert2('Error', 'La caracteristica ya ha sido agregada.', 'error');
+                        return;
+                    } else {
+                        this.newFeatures.push(feature);
+                        document.querySelector('input[name="feature_value"]').value = '';
+                    }
+                    this.newFeaturesStr = JSON.stringify(this.newFeatures);
+                },
+
+                removeperipheral(serialNumber) {
+                    this.peripherals = this.peripherals.filter(p => p.serial_number !== serialNumber);
+                },
+                addperipheral(e) {
+                    e.preventDefault();
+                    const peripheralTypeId = document.querySelector('select[name="peripheral_type_id"]').value;
+                    const peripheralBrandId = document.querySelector('select[name="peripheral_brand_id"]').value;
+                    const peripheralModel = document.querySelector('input[name="peripheral_model"]').value;
+                    const peripheralserialNumber = document.querySelector('input[name="peripheral_serial_number"]')
+                        .value;
+
+                    const peripheral = {
+                        type_id: peripheralTypeId,
+                        brand_id: peripheralBrandId,
+                        model: peripheralModel,
+                        serial_number: peripheralserialNumber
+                    };
+
+                    if (!peripheral.type_id) {
+                        alert2('Error', 'El tipo de periferico es obligatorio.', 'error');
+                        return;
+                    }
+                    if (!peripheral.brand_id) {
+                        alert2('Error', 'La marca del periferico es obligatoria.', 'error');
+                        return;
+                    }
+                    if (!peripheral.model) {
+                        alert2('Error', 'El modelo del periferico es obligatorio.', 'error');
+                        return;
+                    }
+                    if (!peripheral.serial_number) {
+                        alert2('Error', 'El numero de serie del periferico es obligatorio.', 'error');
+                        return;
+                    }
+                    if (this.peripherals.some(p => p.serial_number === peripheral.serial_number)) {
+                        alert2('Error', 'El periferico con este numero de serie ya ha sido agregado.', 'error');
+                        return;
+                    } else {
+                        this.peripherals.push(peripheral);
+                        document.querySelector('input[name="peripheral_model"]').value = '';
+                        document.querySelector('input[name="peripheral_serial_number"]').value = '';
+                    }
+                    this.peripheralsStr = JSON.stringify(this.peripherals);
                 }
             }
         }
-
-
-
     </script>
 
 @endsection

@@ -7,45 +7,52 @@
 @stop
 
 @section('content')
-    <div class="row mt-4 justify-content-center">
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.index') }}" method="GET">
-                @csrf
-                <input type="hidden" name="type" value="pcs">
-                <button class="btn btn-outline-primary btn-lg custom-large-button w-100" data-device-type="computadora"
-                    id="pc" type="submit">
-                    <i class="fas fa-desktop fa-4x d-block mb-2"></i> <span>Computadora</span>
-                </button>
-            </form>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            @foreach (['success', 'error', 'warning'] as $messageType)
+                @if (session($messageType))
+                    <x-adminlte-alert theme="{{ $messageType }}" dismissable>
+                        {{ session($messageType) }}
+                    </x-adminlte-alert>
+                @endif
+            @endforeach
+            @if ($errors->any())
+                <x-adminlte-alert theme="danger" dismissable>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-adminlte-alert>
+            @endif
         </div>
+        <div class="col-md-8">
+            <x-adminlte-card title="Listado de Ficha Tecnica" theme="primary" icon="fas fa-desktop">
+                <x-slot name="toolsSlot">
+                    <x-adminlte-button class="ml-2" label="Crear Ficha Tecnica" theme="success" icon="fas fa-plus"
+                        onclick="window.location.href='{{ route('technicalSheet.create') }}'" />
+                </x-slot>
 
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.index') }} " method="GET">
-                @csrf
-                <input type="hidden" name="type" value="printers">
-                <button type="submit" class="btn btn-outline-info btn-lg custom-large-button w-100"
-                    data-device-type="impresora" id="printer">
-                    <i class="fas fa-print fa-4x d-block mb-2"></i>
-                    <span>Impresora</span>
-                </button>
+                <x-adminlte-datatable id="table1" :heads="['ID', 'Acciones']" striped hoverable>
+                    @foreach ($technicalSheets as $technicalSheet)
+                        <tr>
+                            <td>{{ $technicalSheet->id }}</td>
+                            <td>
+                                <x-adminlte-button class="btn-xs" label="Ver Detalles" theme="primary" icon="fas fa-eye"
+                                    onclick="window.location.href='{{ route('technicalSheet.show', $technicalSheet->id) }}'" />
+                                <x-adminlte-button class="btn-xs" label="Editar" theme="warning" icon="fas fa-edit"
+                                    onclick="window.location.href='{{ route('technicalSheet.edit', $technicalSheet->id) }}'" />
+                                <x-adminlte-button class="btn-xs" label="Eliminar" theme="danger" icon="fas fa-trash-alt"
+                                    data-toggle="modal" data-target="#deleteModal{{ $technicalSheet->id }}" />
+                            </td>
+                        </tr>
+                    @endforeach
 
-            </form>
-        </div>
+                </x-adminlte-datatable>
 
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.index') }}" method="GET">
-                @csrf
-                <input type="hidden" name="type" value="scanners">
-                <button type="submit" class="btn btn-outline-success btn-lg custom-large-button w-100"
-                    data-device-type="escáner" id="scanner">
-                    <i class="fas fa-camera fa-4x d-block mb-2"></i>
-                    <span>Escáner</span>
-                </button>
-            </form>
+
+            </x-adminlte-card>
         </div>
     </div>
-@endsection
-
-@section('adminlte_js')
-
 @endsection

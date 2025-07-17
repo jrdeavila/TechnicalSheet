@@ -12,6 +12,7 @@ return [
     'after' => 'El campo :attribute debe ser una fecha posterior a :date.',
     'before' => 'El campo :attribute debe ser una fecha anterior a :date.',
     'exists' => 'El campo :attribute no existe.',
+    'array' => 'El campo :attribute debe ser una lista de elementos.',
 
     'attributes' => [
         'name' => 'Nombre',
@@ -23,5 +24,18 @@ return [
         'description' => 'Descripción',
         'observations' => 'Observaciones',
         'user_dni' => 'Documento del empleado',
+        'peripheral_type_id' => 'Tipo de periferico',
+        'model' => 'Modelo',
+        'serial_number' => 'Número de serie',
+        'feature_id' => 'Característica',
+        'value' => 'Valor',
+        'features' => 'Características',
+        'peripherals' => 'Perifericos',
+        'features.*.feature_id' => 'Característica',
+        'features.*.value' => 'Valor',
+        'peripherals.*.peripheral_type_id' => 'Tipo de periferico',
+        'peripherals.*.model' => 'Modelo',
+        'peripherals.*.serial_number' => 'Número de serie',
+
     ],
 ];

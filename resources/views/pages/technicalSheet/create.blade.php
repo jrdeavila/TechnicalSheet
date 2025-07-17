@@ -8,41 +8,23 @@
 
 @section('content')
     <div class="row mt-4 justify-content-center">
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.create') }}" method="GET">
-                @csrf
-                <input type="hidden" name="type" value="pc">
-                <button class="btn btn-outline-primary btn-lg custom-large-button w-100" data-device-type="computadora"
-                    id="pc" type="submit">
-                    <i class="fas fa-desktop fa-4x d-block mb-2"></i> <span>Computadora</span>
-                </button>
-            </form>
+        <div class="col-md-3">
+            <x-adminlte-info-box title="Crear Ficha Tecnica de Computador"
+                text="Necesitara la informacion de la computadora para crear la ficha tecnica" icon="fas fa-desktop"
+                theme="light" icon-theme="primary" class="cursor-pointer w-100"
+                onclick="window.location.href='{{ route('technicalSheet.createDevice', ['type' => 'pc']) }}'"></x-adminlte-info-box>
         </div>
-
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.create') }} " method="GET">
-                @csrf
-                <input type="hidden" name="type" value="printer">
-                <button type="submit" class="btn btn-outline-info btn-lg custom-large-button w-100"
-                    data-device-type="impresora" id="printer">
-                    <i class="fas fa-print fa-4x d-block mb-2"></i>
-                    <span>Impresora</span>
-                </button>
-
-            </form>
+        <div class="col-md-3">
+            <x-adminlte-info-box title="Crear Ficha Tecnica de Impresora"
+                text="Necesitara la informacion de la impresora para crear la ficha tecnica" icon="fas fa-print"
+                theme="light" icon-theme="success" class="cursor-pointer w-100"
+                onclick="window.location.href='{{ route('technicalSheet.createDevice', ['type' => 'printer']) }}'"></x-adminlte-info-box>
         </div>
-
-
-        <div class="col-md-2 mb-3">
-            <form action="{{ route('technicalSheet.create') }}" method="GET">
-                @csrf
-                <input type="hidden" name="type" value="scanner">
-                <button type="submit" class="btn btn-outline-success btn-lg custom-large-button w-100"
-                    data-device-type="escáner" id="scanner">
-                    <i class="fas fa-camera fa-4x d-block mb-2"></i>
-                    <span>Escáner</span>
-                </button>
-            </form>
+        <div class="col-md-3">
+            <x-adminlte-info-box title="Crear Ficha Tecnica de Escaner"
+                text="No es necesario informacion adicional para crear la ficha tecnica" icon="fas fa-file-image"
+                theme="light" icon-theme="info" class="cursor-pointer w-100"
+                onclick="window.location.href='{{ route('technicalSheet.createDevice', ['type' => 'scanner']) }}'"></x-adminlte-info-box>
         </div>
     </div>
 @endsection

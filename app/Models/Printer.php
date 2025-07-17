@@ -9,9 +9,5 @@ class Printer extends Model
     protected $connection = 'mysql';
     protected $table = 'printers';
 
-    protected $fillable = [
-        'toner',
-        'ink',
-        'in_network',
-    ];
+    protected $fillable = [];
 }

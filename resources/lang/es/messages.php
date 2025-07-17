@@ -13,4 +13,8 @@ return [
     'warning' => 'Advertencia',
     'success' => 'Éxito',
     'Peripheral Types' => 'Tipos de Perifericos',
+    'Pc' => 'Computadora',
+    'Printer' => 'Impresora',
+    'Scanner' => 'Escaner',
+
 ];

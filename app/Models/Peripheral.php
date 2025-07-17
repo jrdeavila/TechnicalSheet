@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Peripheral extends Model
 {
@@ -15,8 +16,14 @@ class Peripheral extends Model
         'model',
         'serial_number',
         'type_id',
+        'peripheralable_type',
+        'peripheralable_id',
     ];
 
+    public function peripherable(): MorphTo
+    {
+        return $this->morphTo(__FUNCTION__, 'peripheralable_type', 'peripheralable_id');
+    }
 
     public function peripheralType(): BelongsTo
     {

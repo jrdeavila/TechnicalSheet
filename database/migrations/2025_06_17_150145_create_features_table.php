@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('features', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('is_open')->default(true);
             $table->timestamps();
         });
     }
