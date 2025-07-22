@@ -16,7 +16,7 @@ class Computer extends Model
         'operation_system_id'
     ];
 
-    public $with = ['operation_system', 'peripherals', 'featureValues'];
+    public $with = ['operation_system', 'peripherals'];
 
     public function operation_system(): BelongsTo
     {
@@ -26,10 +26,5 @@ class Computer extends Model
     public function peripherals(): MorphMany
     {
         return $this->morphMany(Peripheral::class, 'peripheralable');
-    }
-
-    public function featureValues(): MorphMany
-    {
-        return $this->morphMany(FeatureValue::class, 'featureable');
     }
 }

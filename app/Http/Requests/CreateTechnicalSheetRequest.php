@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Brand;
 use App\Models\Computer;
+use App\Models\Device;
 use App\Models\Feature;
 use App\Models\OperationSystem;
 use App\Models\PeripheralType;
@@ -30,13 +31,15 @@ class CreateTechnicalSheetRequest extends FormRequest
             'features' => ['required', 'array', 'min:1'],
             'features.*.feature_id' => ['required', 'exists:' . Feature::class . ',id'],
             'features.*.value' => ['required', 'string', 'max:255'],
-            'peripherals' => ['required_if:type,pc', 'array', 'min:1'],
+            'peripherals' => ['required_if:type,pc'],
             'peripherals.*.type_id' => ['required', 'exists:' . PeripheralType::class . ',id'],
             'peripherals.*.model' => ['required', 'string', 'max:100'],
             'peripherals.*.serial_number' => ['required', 'string', 'max:100'],
             'operation_system_id' => ['required_if:type,pc', 'exists:' . OperationSystem::class . ',id'],
-            'model' => ['required_if:type,pc', 'string', 'max:100'],
-            'serial_number' => ['required_if:type,pc', 'string', 'max:100'],
+            'model' => ['required', 'string', 'max:100'],
+            'serial_number' => ['required', 'string', 'max:100'],
+            'code' => ['required', 'numeric', 'min:1', 'unique:' . Device::class . ',code'],
+            'mac' => ['required', 'string', 'max:100', 'unique:' . Device::class . ',mac'],
         ];
     }
 
@@ -63,47 +66,40 @@ class CreateTechnicalSheetRequest extends FormRequest
 
     public function handle()
     {
-        switch ($this->type) {
-            case 'pc':
-                $this->createPc();
-                break;
-            case 'printer':
-                $this->createPrinter();
-                break;
-            case 'scanner':
-                $this->createScanner();
-                break;
-            default:
-                throw new Exception('El tipo de dispositivo no es valido');
-        }
+
+        $deviceable = match ($this->type) {
+            'pc' => $this->createPc(),
+            'printer' => $this->createPrinter(),
+            'scanner' => $this->createScanner(),
+        };
+
+        $device = Device::make($this->all());
+        $device->deviceable()->associate($deviceable);
+        $device->save();
+        $device->featureValues()->createMany($this->features);
+
+        $ts = TechnicalSheet::make($this->all());
+        $ts->technicalSheetable()->associate($device);
+        $ts->save();
     }
 
-    public function createPc()
+
+    public function createPc(): Computer
     {
         $computer = Computer::create($this->all());
         $computer->peripherals()->createMany($this->peripherals);
-        // Morph To Many
-        $computer->featureValues()->createMany($this->features);
-        $ts = TechnicalSheet::make($this->all());
-        $ts->technicalSheetable()->associate($computer);
-        $ts->save();
+        return $computer;
     }
 
-    public function createPrinter()
+    public function createPrinter(): Printer
     {
-        $printer = Printer::create($this->all());
-        $printer->featureValues()->createMany($this->features);
-        $ts = TechnicalSheet::make($this->all());
-        $ts->technicalSheetable()->associate($printer);
-        $ts->save();
+        $printer = Printer::create();
+        return $printer;
     }
 
-    public function createScanner()
+    public function createScanner(): Scanner
     {
-        $scanner = Scanner::create($this->all());
-        $scanner->featureValues()->createMany($this->features);
-        $ts = TechnicalSheet::make($this->all());
-        $ts->technicalSheetable()->associate($scanner);
-        $ts->save();
+        $scanner = Scanner::create();
+        return $scanner;
     }
 }

@@ -1,3 +1,5 @@
+@props(['technicalSheet' => null])
+
 @extends('layouts.app')
 
 @section('title', 'Ficha Tecnica')
@@ -29,29 +31,47 @@
                 @endif
             </div>
             <div class="col-md-4">
+                @php
+                    $route = $technicalSheet
+                        ? route('technicalSheet.update', $technicalSheet->id)
+                        : route('technicalSheet.store');
+                @endphp
                 <x-adminlte-card title="Crear Ficha Tecnica de Computadora" theme="primary" icon="fas fa-desktop">
-                    <form action="{{ route('technicalSheet.store') }}" method="POST">
+                    <form action="{{ $route }}" method="POST">
                         @csrf
+                        @if ($technicalSheet)
+                            @method('PUT')
+                        @endif
                         <input type="hidden" name="peripherals[]" :value="peripheralsStr">
                         <input type="hidden" name="features[]" :value="newFeaturesStr">
                         <input type="hidden" name="type" value="pc">
 
                         <x-adminlte-select name="brand_id" label="Marca">
                             @foreach ($brands as $brand)
-                                <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                <option value="{{ $brand->id }}"
+                                    {{ old('brand_id', $technicalSheet?->technicalSheetable->brand_id) == $brand->id ? 'selected' : '' }}>
                                     {{ $brand->name }}</option>
                             @endforeach
                         </x-adminlte-select>
 
 
                         <x-adminlte-input name="model" label="Modelo" placeholder="Ingrese el modelo"
-                            value="{{ old('model') }}" />
+                            value="{{ old('model', $technicalSheet?->technicalSheetable->model) }}" />
                         <x-adminlte-input name="serial_number" label="Numero de serie"
-                            placeholder="Ingrese el numero de serie" value="{{ old('serial_number') }}" />
+                            placeholder="Ingrese el numero de serie"
+                            value="{{ old('serial_number', $technicalSheet?->technicalSheetable->serial_number) }}" />
+
+                        <x-adminlte-input name="mac" label="Direccion MAC" placeholder="Ingrese la direccion MAC"
+                            value="{{ old('mac', $technicalSheet?->technicalSheetable->mac) }}" />
+
+                        <x-adminlte-input name="code" label="Sticker" placeholder="Ingrese el codigo de la sticker"
+                            value="{{ old('code', $technicalSheet?->technicalSheetable->code) }}" />
+
+
                         <x-adminlte-select name="operation_system_id" label="Sistema Operativo">
                             @foreach ($operatingSystems as $operatingSystem)
                                 <option value="{{ $operatingSystem->id }}"
-                                    {{ old('operation_system_id') == $operatingSystem->id ? 'selected' : '' }}>
+                                    {{ old('operation_system_id', $technicalSheet?->technicalSheetable->operation_system_id) == $operatingSystem->id ? 'selected' : '' }}>
                                     {{ $operatingSystem->name }}</option>
                             @endforeach
                         </x-adminlte-select>
@@ -121,16 +141,26 @@
                                 @csrf
                                 <input type="hidden" name="type" value="pc">
 
-                                <x-adminlte-select name="feature_id" label="Caracteristicas">
+                                <x-adminlte-select x-on:change="setAnswers" name="feature_id" label="Caracteristicas">
                                     @foreach ($features as $feature)
                                         <option value="{{ $feature->id }}">{{ $feature->name }}</option>
                                     @endforeach
                                 </x-adminlte-select>
 
-                                <x-adminlte-input name="feature_value" label="Valor de la Caracteristica"
-                                    placeholder="Ingrese el valor de la caracteristica" />
+                                <div x-show="answers.length > 0">
+                                    <x-adminlte-select name="feature_value" id="feature_value"
+                                        label="Respuestas de la Caracteristica">
+                                        <template x-for="(answer, index) in answers" :key="index">
+                                            <option x-text="answer"></option>
+                                        </template>
+                                    </x-adminlte-select>
+                                </div>
 
-
+                                <div x-show="answers.length == 0">
+                                    <x-adminlte-input name="feature_value" id="feature_value"
+                                        label="Valor de la Caracteristica"
+                                        placeholder="Ingrese el valor de la caracteristica" />
+                                </div>
                                 <x-adminlte-button type="submit" label="Agregar Caracteristicas" theme="success"
                                     icon="fas fa-plus" />
                         </x-adminlte-card>
@@ -177,6 +207,20 @@
     <script src="{{ asset('vendor/sweetalert2/sweetalert2.js') }}"></script>
     {{-- Alpine --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+
+    @php
+        $oldPeripherals = old(
+            'peripherals',
+            json_encode($technicalSheet?->technicalSheetable?->deviceable?->peripherals?->toArray() ?? []),
+        );
+        $oldFeatures = old(
+            'features',
+            json_encode($technicalSheet?->technicalSheetable?->featureValues?->toArray() ?? []),
+        );
+    @endphp
+
+
     <script>
         const alert2 = (title, text, icon) => {
             Swal.fire({
@@ -188,10 +232,18 @@
         };
 
         function data() {
-            const peripherals = JSON.parse(@json(old('peripherals') ?? '[]'));
-            const newFeatures = JSON.parse(@json(old('features') ?? '[]'));
+            let peripherals = @json($oldPeripherals);
+            peripherals = peripherals.toString();
+            peripherals = peripherals ? JSON.parse(peripherals) : [];
+            let newFeatures = @json($oldFeatures);
+            newFeatures = newFeatures.toString();
+            newFeatures = newFeatures ? JSON.parse(newFeatures) : [];
+
+            console.log('Peripherals:', peripherals);
+            console.log('New Features:', newFeatures);
             return {
                 brands: @json($brands),
+                answers: [],
                 peripheralTypes: @json($peripheralTypes),
                 peripherals,
                 peripheralsStr: JSON.stringify(peripherals),
@@ -275,6 +327,16 @@
                         document.querySelector('input[name="peripheral_serial_number"]').value = '';
                     }
                     this.peripheralsStr = JSON.stringify(this.peripherals);
+                },
+                setAnswers() {
+                    const featureId = document.querySelector('select[name="feature_id"]').value;
+                    const feature = this.fetures.find(f => f.id == featureId);
+                    if (feature) {
+                        this.answers = feature.answers.map(answer => answer.value);
+                    } else {
+                        this.answers = [];
+                    }
+
                 }
             }
         }

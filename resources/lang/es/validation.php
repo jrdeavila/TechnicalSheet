@@ -14,6 +14,7 @@ return [
     'exists' => 'El campo :attribute no existe.',
     'array' => 'El campo :attribute debe ser una lista de elementos.',
     'required_if' => 'El campo :attribute es requerido cuando :other es :value.',
+    'min.array' => 'El campo :attribute debe tener al menos :min elementos.',
 
     'attributes' => [
         'name' => 'Nombre',
@@ -37,6 +38,10 @@ return [
         'peripherals.*.peripheral_type_id' => 'Tipo de periferico',
         'peripherals.*.model' => 'Modelo',
         'peripherals.*.serial_number' => 'Número de serie',
+        'mac' => 'Dirección MAC',
+        'code' => 'Sticker',
+        'brand_id' => 'Marca',
+        'type' => 'Tipo',
 
     ],
 ];

@@ -8,6 +8,56 @@
 
 @section('content')
     <div x-data="data()" class="row justify-content-center mt-4">
+        <div class="col-md-12">
+            @foreach (['success', 'error', 'warning'] as $messageType)
+                @if (session($messageType))
+                    <x-adminlte-alert theme="{{ $messageType }}" title="{{ __('messages.' . $messageType) }}">
+                        {{ session($messageType) }}
+                    </x-adminlte-alert>
+                @endif
+            @endforeach
+
+            @if ($errors->any())
+                <x-adminlte-alert theme="danger" title="Error">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-adminlte-alert>
+            @endif
+        </div>
+        <div class="col-md-4">
+            <x-adminlte-card title="Crear Ficha Tecnica de Impresora" theme="primary" icon="fas fa-desktop">
+                <form action="{{ route('technicalSheet.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="features[]" :value="newFeaturesStr">
+                    <input type="hidden" name="type" value="printer">
+
+                    <x-adminlte-select name="brand_id" label="Marca">
+                        @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }}</option>
+                        @endforeach
+                    </x-adminlte-select>
+
+
+                    <x-adminlte-input name="model" label="Modelo" placeholder="Ingrese el modelo"
+                        value="{{ old('model') }}" />
+                    <x-adminlte-input name="serial_number" label="Numero de serie" placeholder="Ingrese el numero de serie"
+                        value="{{ old('serial_number') }}" />
+
+                    <x-adminlte-input name="code" label="Sticker" placeholder="Ingrese el codigo del sticker"
+                        value="{{ old('code') }}" />
+
+                    <x-adminlte-input name="mac" label="Direccion MAC" placeholder="Ingrese la direccion MAC"
+                        value="{{ old('mac') }}" />
+
+                    <x-adminlte-button type="submit" label="Guardar" theme="primary" icon="fas fa-save" />
+                </form>
+            </x-adminlte-card>
+        </div>
+
         <div class="col-md-4">
             <div class="row">
                 <div class="col-md-12">
@@ -22,11 +72,19 @@
                                 @endforeach
                             </x-adminlte-select>
 
-                            <x-adminlte-select x-show="answers.length > 0" name="" <x-adminlte-input
-                                name="feature_value" label="Valor de la Caracteristica"
-                                placeholder="Ingrese el valor de la caracteristica" />
+                            <div x-show="answers.length > 0">
+                                <x-adminlte-select name="feature_answers" id="feature_answers"
+                                    label="Respuestas de la Caracteristica">
+                                    <template x-for="(answer, index) in answers" :key="index">
+                                        <option x-text="answer"></option>
+                                    </template>
+                                </x-adminlte-select>
+                            </div>
 
-
+                            <div x-show="answers.length == 0">
+                                <x-adminlte-input name="feature_value" label="Valor de la Caracteristica"
+                                    placeholder="Ingrese el valor de la caracteristica" />
+                            </div>
                             <x-adminlte-button type="submit" label="Agregar Caracteristicas" theme="success"
                                 icon="fas fa-plus" />
                     </x-adminlte-card>
@@ -88,7 +146,7 @@
                 answers: [],
                 newFeaturesStr: JSON.stringify(newFeatures),
                 newFeatures,
-                setAnwsers() {
+                setAnswers() {
                     const featureId = document.querySelector('select[name="feature_id"]').value;
                     const feature = this.fetures.find(f => f.id == featureId);
                     if (feature) {

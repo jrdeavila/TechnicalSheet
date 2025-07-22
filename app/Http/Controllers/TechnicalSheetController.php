@@ -18,9 +18,9 @@ class TechnicalSheetController extends Controller
 {
     public function index(Request $request)
     {
-
         $technicalSheets = TechnicalSheet::paginate(5);
-        return view('pages.technicalSheet.index', compact('technicalSheets'));
+        $brands = Brand::all();
+        return view('pages.technicalSheet.index', compact('technicalSheets', 'brands'));
     }
 
     public function show(TechnicalSheet $technicalSheet)
@@ -31,16 +31,16 @@ class TechnicalSheetController extends Controller
     public function createDevice(string $type, Request $request)
     {
         $features = Feature::all();
+        $brands = Brand::all();
         switch ($type) {
             case 'pc':
                 $peripheralTypes = PeripheralType::all();
-                $brands = Brand::all();
                 $operatingSystems = OperationSystem::all();
                 return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features'));
             case 'printer':
-                return view('pages.technicalSheet.views.printer', compact('features'));
+                return view('pages.technicalSheet.views.printer', compact('features', 'brands'));
             case 'scanner':
-                return view('pages.technicalSheet.views.scanner', compact('features'));
+                return view('pages.technicalSheet.views.scanner', compact('features', 'brands'));
             default:
                 return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features'));
         }
@@ -51,9 +51,23 @@ class TechnicalSheetController extends Controller
         return view('pages.technicalSheet.create');
     }
 
-    public function edit(TechnicalSheet $technicalSheet)
+    public function edit(TechnicalSheet $technicalSheet, Request $request)
     {
-        return view('pages.technicalSheet.edit');
+        $type = $request->get('type');
+        $features = Feature::all();
+        $brands = Brand::all();
+        switch ($type) {
+            case 'pc':
+                $peripheralTypes = PeripheralType::all();
+                $operatingSystems = OperationSystem::all();
+                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'technicalSheet'));
+            case 'printer':
+                return view('pages.technicalSheet.views.printer', compact('features', 'brands', 'technicalSheet'));
+            case 'scanner':
+                return view('pages.technicalSheet.views.scanner', compact('features', 'brands', 'technicalSheet'));
+            default:
+                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'technicalSheet'));
+        }
     }
 
     public function store(CreateTechnicalSheetRequest $request)

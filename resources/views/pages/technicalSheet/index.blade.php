@@ -28,31 +28,54 @@
             @endif
         </div>
         <div class="col-md-8">
-            <x-adminlte-card title="Listado de Ficha Tecnica" theme="primary" icon="fas fa-desktop">
-                <x-slot name="toolsSlot">
-                    <x-adminlte-button class="ml-2" label="Crear Ficha Tecnica" theme="success" icon="fas fa-plus"
-                        onclick="window.location.href='{{ route('technicalSheet.create') }}'" />
-                </x-slot>
-
-                <x-adminlte-datatable id="table1" :heads="['ID', 'Acciones']" striped hoverable>
-                    @foreach ($technicalSheets as $technicalSheet)
-                        <tr>
-                            <td>{{ $technicalSheet->id }}</td>
-                            <td>
-                                <x-adminlte-button class="btn-xs" label="Ver Detalles" theme="primary" icon="fas fa-eye"
-                                    onclick="window.location.href='{{ route('technicalSheet.show', $technicalSheet->id) }}'" />
-                                <x-adminlte-button class="btn-xs" label="Editar" theme="warning" icon="fas fa-edit"
-                                    onclick="window.location.href='{{ route('technicalSheet.edit', $technicalSheet->id) }}'" />
-                                <x-adminlte-button class="btn-xs" label="Eliminar" theme="danger" icon="fas fa-trash-alt"
-                                    data-toggle="modal" data-target="#deleteModal{{ $technicalSheet->id }}" />
-                            </td>
-                        </tr>
-                    @endforeach
-
-                </x-adminlte-datatable>
-
-
+            <x-adminlte-card title="Filtros de Busqueda" theme="light" icon="fas fa-search" class="w-100">
+                <form action="{{ route('technicalSheet.index') }}" method="GET">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <x-adminlte-input name="search" label="Buscar por Sticker o Modelo" placeholder="Buscar..."
+                                value="{{ request('search') }}" />
+                        </div>
+                        <div class="col-lg-2">
+                            <x-adminlte-select name="brand_id" label="Marca">
+                                <option value="">Todas</option>
+                                @foreach ($brands as $brand)
+                                    <option value="{{ $brand->id }}"
+                                        {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}</option>
+                                @endforeach
+                            </x-adminlte-select>
+                        </div>
+                        <div class="col-md-12">
+                            <x-adminlte-button type="submit" label="Buscar" theme="primary" icon="fas fa-search" />
+                        </div>
+                    </div>
+                </form>
             </x-adminlte-card>
+        </div>
+        <div class="col-md-8">
+            @php
+                $computers = $technicalSheets->where('technicalSheetable.deviceable_type', \App\Models\Computer::class);
+                $printers = $technicalSheets->where('technicalSheetable.deviceable_type', \App\Models\Printer::class);
+                $scanners = $technicalSheets->where('technicalSheetable.deviceable_type', \App\Models\Scanner::class);
+                $contents = [
+                    view('components.technical-sheets.pc-table', [
+                        'computers' => $computers,
+                    ]),
+                    view('components.technical-sheets.printer-table', [
+                        'printers' => $printers,
+                    ]),
+                    view('components.technical-sheets.scanner-table', [
+                        'scanners' => $scanners,
+                    ]),
+                ];
+                $items = [
+                    "Computadores ({$computers->count()})",
+                    "Impresoras ({$printers->count()})",
+                    "Escaners ({$scanners->count()})",
+                ];
+            @endphp
+            <x-tab title="Resultados de la Búsqueda" icon="fas fa-search" theme="light" :items="$items"
+                :contents="$contents" />
         </div>
     </div>
 @endsection
