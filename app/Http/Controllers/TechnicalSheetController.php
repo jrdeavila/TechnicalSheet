@@ -9,6 +9,7 @@ use App\Models\Feature;
 use App\Models\OperationSystem;
 use App\Models\PeripheralType;
 use App\Models\TechnicalSheet;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,21 +31,36 @@ class TechnicalSheetController extends Controller
 
     public function createDevice(string $type, Request $request)
     {
+        $search = $request->get('search');
+        if ($search) {
+
+            $users = User::query()
+                ->whereHas('employee', function ($query) use ($search) {
+                    $query->where('nombres', 'like', "%{$search}%")
+                        ->orWhere('apellidos', 'like', "%{$search}%")
+                        ->orWhere('noDocumento', 'like', "%{$search}%");
+                })->get();
+        } else {
+            $users = null;
+        }
+        $brands = Brand::all();
         $features = Feature::all();
+        $brands = Brand::all();
         switch ($type) {
             case 'pc':
                 $peripheralTypes = PeripheralType::all();
                 $brands = Brand::all();
                 $operatingSystems = OperationSystem::all();
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features'));
+                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'users',));
             case 'printer':
-                return view('pages.technicalSheet.views.printer', compact('features'));
+                return view('pages.technicalSheet.views.printer', compact('features', 'users','brands',));
             case 'scanner':
-                return view('pages.technicalSheet.views.scanner', compact('features'));
+                return view('pages.technicalSheet.views.scanner', compact('features', 'users','brands',));
             default:
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features'));
+                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'users',));
         }
     }
+
 
     public function create(Request $request)
     {

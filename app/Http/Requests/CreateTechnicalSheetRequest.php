@@ -10,6 +10,7 @@ use App\Models\PeripheralType;
 use App\Models\Printer;
 use App\Models\Scanner;
 use App\Models\TechnicalSheet;
+use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +38,8 @@ class CreateTechnicalSheetRequest extends FormRequest
             'operation_system_id' => ['required_if:type,pc', 'exists:' . OperationSystem::class . ',id'],
             'model' => ['required_if:type,pc', 'string', 'max:100'],
             'serial_number' => ['required,if:type,pc', 'string', 'max:100'],
+            'assigned_to' => ['nullable', 'exists:' . User::class . ',id'],
+            'place' => ['nullable', 'string', 'max:255'],
         ];
     }
 

@@ -56,7 +56,46 @@
                             @endforeach
                         </x-adminlte-select>
                         <x-adminlte-button type="submit" label="Guardar" theme="primary" icon="fas fa-save" />
+
                     </form>
+                </x-adminlte-card>
+                <x-adminlte-card title="Responsable y ubicacion" theme="primary" icon="fas fa-user">
+                    <form action="{{ route('technicalSheet.createDevice', 'pc') }}" method="GET">
+                        <x-adminlte-input name="search" label="Buscar por nombre o cedula"
+                            placeholder="Ingrese el nombre o cedula" />
+                        <x-adminlte-button type="submit" label="Buscar" theme="primary" icon="fas fa-search" />
+                        @if (isset($users))
+                            <x-adminlte-button
+                                onclick="window.location = '{{ route('technicalSheet.createDevice', 'pc') }}';"
+                                label="Limpiar" theme="warning" icon="fas fa-eraser" />
+                        @endif
+                    </form>
+
+                    <br>
+
+                    @if (isset($users))
+                        <x-adminlte-select name="user_id" :label="'Resultados de la busqueda (' . $users->count() . ')'">
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                    {{ $user->employee->full_name }}</option>
+                            @endforeach
+                        </x-adminlte-select>
+                    @endif
+                    <x-adminlte-select name="location_id" label="Ubicacion">
+                        <option value="">Seleccione una ubicacion</option>
+                        <option value="1">Manaure</option>
+                        <option value="2">La paz</option>
+                        <option value="3">Becerril</option>
+                        <option value="4">La loma</option>
+                        <option value="5">Codazzi</option>
+                        <option value="6">El copey</option>
+                        <option value="7">Chimichagua</option>
+                        <option value="8">Astrea</option>
+                        <option value="9">Chiriguana</option>
+                        <option value="10">La jagua</option>
+                        <option value="11">Pueblo bello</option>
+                        <option value="12">Bosconia</option>
+                    </x-adminlte-select>
                 </x-adminlte-card>
             </div>
             <div class="col-md-4">
