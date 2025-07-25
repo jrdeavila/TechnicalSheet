@@ -7,7 +7,6 @@
     <div class="d-flex flex-column align-items-start justify-content-center">
 
         <h1>Tipos de periféricos</h1>
-        <p>Lista de tipos de periféricos disponibles en el sistema.</p>
     </div>
 @endsection
 

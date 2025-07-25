@@ -3,7 +3,6 @@
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\OperatingSystemController;
 use App\Http\Controllers\OperationSystemController;
 use App\Http\Controllers\PeripheralTypeController;
 use App\Http\Controllers\TechnicalSheetController;
@@ -22,8 +21,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/technical-sheets/create/{type}', [TechnicalSheetController::class, 'createDevice'])->name('technicalSheet.createDevice');
     Route::resource('technical-sheets', TechnicalSheetController::class)->names('technicalSheet');
     Route::resource('peripheral-types', PeripheralTypeController::class)->names('peripheralType');
-    Route::resource('features', FeatureController::class)->names('feature');
-    Route::resource('operating-systems', OperationSystemController::class)->names('operatingSystem');
+    Route::resource('features', FeatureController::class)
+        ->except(['show', 'create', 'edit'])
+        ->names('feature');
+    Route::resource('operation-systems', OperationSystemController::class)
+        ->except(['show', 'create', 'edit'])
+        ->names('operationSystem');
     Route::resource('brands', BrandController::class)
         ->except(['show', 'create', 'edit'])
         ->names('brand');

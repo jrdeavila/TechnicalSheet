@@ -352,7 +352,7 @@ return [
                 ],
                 [
                     'text' => 'Sistemas operativos',
-                    'route' => 'operatingSystem.index',
+                    'route' => 'operationSystem.index',
                     'icon' => 'fas fa-tachometer-alt',
                     'can' => 'list-operating-system',
                 ],
