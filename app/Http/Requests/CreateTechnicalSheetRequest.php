@@ -38,9 +38,9 @@ class CreateTechnicalSheetRequest extends FormRequest
             'peripherals.*.serial_number' => ['required', 'string', 'max:100'],
             'operation_system_id' => ['required_if:type,pc', 'exists:' . OperationSystem::class . ',id'],
             'model' => ['required_if:type,pc', 'string', 'max:100'],
-            'serial_number' => ['required,if:type,pc', 'string', 'max:100'],
+            'serial_number' => ['required_if:type,pc', 'string', 'max:100'],
             'assigned_to' => ['nullable', 'exists:' . User::class . ',id'],
-            'place' => ['nullable', 'string', 'max:255'],
+            'place' => ['nullable', 'string', 'max:255', 'in:' . implode(',', config('locations'))],
         ];
     }
 

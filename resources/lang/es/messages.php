@@ -9,7 +9,7 @@ return [
     'Reports' => 'Reportes',
     'Technical Sheets' => 'Listado de Ficha Tecnica',
     'Scanner' => 'Escaner',
-    'PC' => 'Computadora',
+    'Pc' => 'Computadora',
     'Printer' => 'Impresora',
     'Brands' => 'Marcas',
     'error' => 'Error',

@@ -31,32 +31,28 @@ class TechnicalSheetController extends Controller
 
     public function createDevice(string $type, Request $request)
     {
-        $search = $request->get('search');
-        if ($search) {
+        $users = User::with('employee')->get();
 
-            $users = User::query()
-                ->whereHas('employee', function ($query) use ($search) {
-                    $query->where('nombres', 'like', "%{$search}%")
-                        ->orWhere('apellidos', 'like', "%{$search}%")
-                        ->orWhere('noDocumento', 'like', "%{$search}%");
-                })->get();
-        } else {
-            $users = null;
-        }
         $brands = Brand::all();
         $features = Feature::all();
         $brands = Brand::all();
+        $locations = config('locations');
+        $params = ['users', 'brands', 'features', 'locations'];
         switch ($type) {
             case 'pc':
                 $peripheralTypes = PeripheralType::all();
                 $operatingSystems = OperationSystem::all();
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'users',));
+                $params = array_merge($params, ['peripheralTypes', 'operatingSystems']);
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.pc', $params);
             case 'printer':
-                return view('pages.technicalSheet.views.printer', compact('features', 'users', 'brands',));
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.printer', $params);
             case 'scanner':
-                return view('pages.technicalSheet.views.scanner', compact('features', 'users', 'brands',));
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.scanner', $params);
             default:
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'users',));
+                throw new Exception('Invalid type');
         }
     }
 
@@ -71,17 +67,24 @@ class TechnicalSheetController extends Controller
         $type = $request->get('type');
         $features = Feature::all();
         $brands = Brand::all();
+        $users = User::with('employee')->get();
+        $locations = config('locations');
+        $params = ['users', 'brands', 'features', 'locations', 'technicalSheet'];
         switch ($type) {
             case 'pc':
                 $peripheralTypes = PeripheralType::all();
                 $operatingSystems = OperationSystem::all();
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'technicalSheet'));
+                $params = array_merge($params, ['peripheralTypes', 'operatingSystems']);
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.pc', $params);
             case 'printer':
-                return view('pages.technicalSheet.views.printer', compact('features', 'brands', 'technicalSheet'));
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.printer', $params);
             case 'scanner':
-                return view('pages.technicalSheet.views.scanner', compact('features', 'brands', 'technicalSheet'));
+                $params = compact(...$params);
+                return view('pages.technicalSheet.views.scanner', $params);
             default:
-                return view('pages.technicalSheet.views.pc', compact('peripheralTypes', 'brands', 'operatingSystems', 'features', 'technicalSheet'));
+                throw new Exception('Invalid type');
         }
     }
 
