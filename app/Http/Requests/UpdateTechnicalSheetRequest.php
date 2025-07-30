@@ -12,6 +12,7 @@ use App\Models\PeripheralType;
 use App\Models\Printer;
 use App\Models\Scanner;
 use App\Models\TechnicalSheet;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +42,8 @@ class UpdateTechnicalSheetRequest extends FormRequest
             'serial_number' => ['required', 'string', 'max:100'],
             'code' => ['required', 'numeric', 'min:1', 'unique:' . Device::class . ',code,' . $this->technical_sheet->technicalSheetable->id],
             'mac' => ['required', 'string', 'max:100', 'unique:' . Device::class . ',mac,' . $this->technical_sheet->technicalSheetable->id],
+            'assigned_to' => ['nullable', 'exists:' . User::class . ',id'],
+            'place' => ['nullable', 'string', 'max:255', 'in:' . implode(',', config('locations'))],
         ];
     }
 
@@ -74,8 +77,8 @@ class UpdateTechnicalSheetRequest extends FormRequest
             'printer' => $this->updatePrinter(),
             'scanner' => $this->updateScanner(),
         };
-
-        $device = $this->technicalSheet->technicalSheetable;
+        $technicalSheet = TechnicalSheet::find($this->id);
+        $device = $technicalSheet->technicalSheetable;
         $device->brand_id = $this->brand_id;
         $device->model = $this->model;
         $device->serial_number = $this->serial_number;
@@ -84,6 +87,10 @@ class UpdateTechnicalSheetRequest extends FormRequest
         $device->featureValues()->delete();
         $device->featureValues()->createMany($this->features);
         $device->save();
+
+        $technicalSheet->place = $this->place;
+        $technicalSheet->assigned_to = $this->assigned_to;
+        $technicalSheet->save();
     }
 
 

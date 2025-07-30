@@ -9,9 +9,10 @@
 @stop
 
 @section('content')
+
     <div x-data="data()">
         <div class="row justify-content-center mt-4">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 @foreach (['success', 'error', 'warning'] as $messageType)
                     @if (session($messageType))
                         <x-adminlte-alert theme="{{ $messageType }}" title="{{ __('messages.' . $messageType) }}">
@@ -30,168 +31,397 @@
                     </x-adminlte-alert>
                 @endif
             </div>
-            <div class="col-md-4">
-                @php
-                    $route = $technicalSheet
-                        ? route('technicalSheet.update', $technicalSheet->id)
-                        : route('technicalSheet.store');
-                @endphp
-                <x-adminlte-card title="Crear Ficha Tecnica de Computadora" theme="primary" icon="fas fa-desktop">
-                    <form action="{{ $route }}" method="POST">
-                        @csrf
-                        @if ($technicalSheet)
-                            @method('PUT')
-                        @endif
-                        <input type="hidden" name="peripherals[]" :value="peripheralsStr">
-                        <input type="hidden" name="features[]" :value="newFeaturesStr">
-                        <input type="hidden" name="type" value="pc">
 
-                        <x-adminlte-select name="brand_id" label="Marca">
-                            @foreach ($brands as $brand)
-                                <option value="{{ $brand->id }}"
-                                    {{ old('brand_id', $technicalSheet?->technicalSheetable->brand_id) == $brand->id ? 'selected' : '' }}>
-                                    {{ $brand->name }}</option>
-                            @endforeach
-                        </x-adminlte-select>
+            <div class="col-md-8">
+                <x-tab title="Informacion de la computadora" theme="light">
+                    <x-slot name="items">
+                        <li class="nav-item">
+                            <a class="nav-link active disabled" id="info-tab" data-toggle="pill" href="#info"
+                                aria-controls="info" aria-selected="true">
+                                <span class="fas fa-info-circle"></span>
+                                <span>Detalles del equipo</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled" id="user-tab" data-toggle="pill" href="#user"
+                                aria-controls="user" aria-selected="false">
+                                <span class="fas fa-user"></span>
+                                <span>Responsable y ubicacion</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled" id="peripherals-tab" data-toggle="pill" href="#peripherals"
+                                aria-controls="peripherals" aria-selected="false">
+                                <span class="fas fa-laptop"></span>
+                                <span>Perifericos</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled" id="features-tab" data-toggle="pill" href="#features"
+                                aria-controls="features" aria-selected="false">
+                                <span class="fas fa-laptop"></span>
+                                <span>Caracteristicas</span>
+                            </a>
+                        </li>
+
+                        <li x-show="brandId || model || serialNumber || mac ||code || peripherals.length > 0 || newFeatures.length > 0 || operationSystemId"
+                            class="nav-item">
+                            <a class="nav-link disabled" id="resume-tab" data-toggle="pill" href="#resume"
+                                aria-controls="resume" aria-selected="false">
+                                <span class="fas fa-laptop"></span>
+                                <span>Resumen</span>
+                            </a>
+                        </li>
 
 
-                        <x-adminlte-input name="model" label="Modelo" placeholder="Ingrese el modelo"
-                            value="{{ old('model', $technicalSheet?->technicalSheetable->model) }}" />
-                        <x-adminlte-input name="serial_number" label="Numero de serie"
-                            placeholder="Ingrese el numero de serie"
-                            value="{{ old('serial_number', $technicalSheet?->technicalSheetable->serial_number) }}" />
+                    </x-slot>
 
-                        <x-adminlte-input name="mac" label="Direccion MAC" placeholder="Ingrese la direccion MAC"
-                            value="{{ old('mac', $technicalSheet?->technicalSheetable->mac) }}" />
+                    <x-slot name="contents">
 
-                        <x-adminlte-input name="code" label="Sticker" placeholder="Ingrese el codigo de la sticker"
-                            value="{{ old('code', $technicalSheet?->technicalSheetable->code) }}" />
+                        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
 
-
-                        <x-adminlte-select name="operation_system_id" label="Sistema Operativo">
-                            @foreach ($operatingSystems as $operatingSystem)
-                                <option value="{{ $operatingSystem->id }}"
-                                    {{ old('operation_system_id', $technicalSheet?->technicalSheetable->operation_system_id) == $operatingSystem->id ? 'selected' : '' }}>
-                                    {{ $operatingSystem->name }}</option>
-                            @endforeach
-                        </x-adminlte-select>
-                        <x-adminlte-button type="submit" label="Guardar" theme="primary" icon="fas fa-save" />
-                    </form>
-                </x-adminlte-card>
-            </div>
-            <div class="col-md-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <x-adminlte-card title="Perifericos" theme="secondary" icon="fas fa-mouse">
-                            <form @submit.prevent="addperipheral">
-                                <x-adminlte-select name="peripheral_type_id" label="Tipo de Periferico">
-                                    @foreach ($peripheralTypes as $peripheralType)
-                                        <option value="{{ $peripheralType->id }}">{{ $peripheralType->name }}</option>
-                                    @endforeach
-                                </x-adminlte-select>
-
-                                <x-adminlte-select name="peripheral_brand_id" label="Marca">
-                                    @foreach ($brands as $brand)
-                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                    @endforeach
-                                </x-adminlte-select>
-
-                                <x-adminlte-input name="peripheral_model" label="Modelo"
-                                    placeholder="Ingrese el modelo del periferico" />
-                                <x-adminlte-input name="peripheral_serial_number" label="Numero de serie"
-                                    placeholder="Ingrese el numero de serie del periferico" />
-
-                                <x-adminlte-button type="submit" label="Agregar Periferico" theme="success"
-                                    icon="fas fa-plus" />
-                            </form>
-                        </x-adminlte-card>
-                    </div>
-                    <div x-show="peripherals.length > 0" class="col-md-12">
-                        <x-adminlte-card title="Perifericos Agregados" theme="info" icon="fas fa-list">
-                            <x-adminlte-datatable id="peripheralTable" :heads="['Tipo', 'Marca', 'Modelo', 'Numero de Serie', 'Acciones']" :config="[
-                                'searching' => false,
-                                'paging' => false,
-                                'info' => false,
-                            ]">
-                                <template x-for="peripheral in peripherals" :key="peripheral.serial_number">
-                                    <tr>
-                                        <td x-text="peripheralTypes.find(pt => pt.id == peripheral.type_id).name">
-                                        </td>
-                                        <td x-text="brands.find(b => b.id == peripheral.brand_id).name"></td>
-                                        <td x-text="peripheral.model"></td>
-                                        <td x-text="peripheral.serial_number"></td>
-                                        <td>
-                                            <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
-                                                @click="removeperipheral(peripheral.serial_number)" />
-                                        </td>
-                                    </tr>
+                            <x-adminlte-select x-model="brandId" name="brand_id" label="Marca">
+                                <template x-for="brand in brands" :key="brand.id">
+                                    <option x-bind:value="brand.id"
+                                        x-bind:selected="brand.id ==
+                                            '{{ old('brand_id', $technicalSheet?->technicalSheetable->brand_id) }}'"
+                                        x-text="brand.name">
+                                    </option>
                                 </template>
-                            </x-adminlte-datatable>
-                        </x-adminlte-card>
-                    </div>
+                            </x-adminlte-select>
 
-
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <x-adminlte-card title="Caracteristicas del Equipo" theme="secondary" icon="fas fa-cogs">
-                            <form @submit.prevent="addFeature">
-                                @csrf
-                                <input type="hidden" name="type" value="pc">
-
-                                <x-adminlte-select x-on:change="setAnswers" name="feature_id" label="Caracteristicas">
-                                    @foreach ($features as $feature)
-                                        <option value="{{ $feature->id }}">{{ $feature->name }}</option>
-                                    @endforeach
-                                </x-adminlte-select>
-
-                                <div x-show="answers.length > 0">
-                                    <x-adminlte-select name="feature_value" id="feature_value"
-                                        label="Respuestas de la Caracteristica">
-                                        <template x-for="(answer, index) in answers" :key="index">
-                                            <option x-text="answer"></option>
+                            <x-adminlte-input x-model="model" name="model" label="Modelo"
+                                placeholder="Ingrese el modelo" />
+                            <x-adminlte-input x-model="serialNumber" name="serial_number" label="Numero de serie"
+                                placeholder="Ingrese el numero de serie" />
+                            <x-adminlte-input x-model="mac" name="mac" label="Direccion MAC"
+                                placeholder="Ingrese la direccion MAC" />
+                            <x-adminlte-input x-model="code" name="code" label="Sticker"
+                                placeholder="Ingrese el codigo de la sticker" />
+                            <x-adminlte-select x-model="operation_system_id" name="operation_system_id"
+                                label="Sistema Operativo">
+                                <template x-for="operatingSystem in operationSystems" :key="operatingSystem.id">
+                                    <option x-bind:value="operatingSystem.id"
+                                        x-bind:selected="operatingSystem.id ==
+                                            '{{ old('operation_system_id', $technicalSheet?->technicalSheetable->operation_system_id) }}'"
+                                        x-text="operatingSystem.name">
+                                    </option>
+                                </template>
+                            </x-adminlte-select>
+                            <div class="row justify-content-between">
+                                <x-adminlte-button label="Regresar" theme="primary" icon="fas fa-arrow-left"
+                                    x-on:click="nextTab('info-tab')" />
+                                <x-adminlte-button label="Siguiente" theme="primary" icon="fas fa-arrow-right"
+                                    x-on:click="nextTab('user-tab')" />
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <x-adminlte-select x-on:change="(e) => console.log(e.target.value)" x-model="userId"
+                                        id="user_id" name="user_id" label="Responsable" style="width: 100%"
+                                        class="select2">
+                                        <template x-for="user in users" :key="user.id">
+                                            <option x-bind:value="user.id"
+                                                x-bind:selected="user.id ==
+                                                    '{{ old('user_id', $technicalSheet?->technicalSheetable->user_id) }}'"
+                                                x-text="user.employee.full_name">
+                                            </option>
                                         </template>
                                     </x-adminlte-select>
                                 </div>
-
-                                <div x-show="answers.length == 0">
-                                    <x-adminlte-input name="feature_value" id="feature_value"
-                                        label="Valor de la Caracteristica"
-                                        placeholder="Ingrese el valor de la caracteristica" />
+                                <div class="col-md-6">
+                                    <x-adminlte-select x-model="selectedLocation" name="location" label="Ubicacion"
+                                        style="width: 100%;" class="select2">
+                                        <option value="">Seleccione una ubicacion</option>
+                                        <template x-for="location in locations" :key="location">
+                                            <option x-bind:value="location"
+                                                x-bind:selected="location ==
+                                                    '{{ old('place', $technicalSheet?->place) }}'"
+                                                x-text="location">
+                                            </option>
+                                        </template>
+                                    </x-adminlte-select>
                                 </div>
-                                <x-adminlte-button type="submit" label="Agregar Caracteristicas" theme="success"
-                                    icon="fas fa-plus" />
-                        </x-adminlte-card>
-                    </div>
-                    <div x-show="newFeatures.length > 0" class="col-md-12">
-                        <x-adminlte-card title="Caracteristicas Agregadas" theme="info" icon="fas fa-list">
-                            <x-adminlte-datatable id="featureTable" :heads="['Caracteristica', 'Valor', 'Acciones']" :config="[
-                                'searching' => false,
-                                'paging' => false,
-                                'info' => false,
-                            ]">
-                                <template x-for="feature in newFeatures" :key="feature.feature_id">
-                                    <tr>
-                                        <td x-text="fetures.find(f => f.id == feature.feature_id).name"></td>
-                                        <td x-text="feature.value"></td>
-                                        <td>
-                                            <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
-                                                @click="removeFeature(feature.feature_id)" />
-                                        </td>
-                                    </tr>
-                                </template>
-                            </x-adminlte-datatable>
-                        </x-adminlte-card>
-                    </div>
+                            </div>
+                            <div class="row justify-content-between">
+                                <x-adminlte-button label="Regresar" theme="primary" icon="fas fa-arrow-left"
+                                    x-on:click="nextTab('info-tab')" />
+                                <x-adminlte-button label="Siguiente" theme="primary" icon="fas fa-arrow-right"
+                                    x-on:click="nextTab('peripherals-tab')" />
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="peripherals" role="tabpanel" aria-labelledby="peripherals-tab">
+                            <div class="col-md-12">
+                                <form @submit.prevent="addperipheral">
+                                    <x-adminlte-select name="peripheral_type_id" label="Tipo de Periferico"
+                                        style="width: 100%">
+                                        @foreach ($peripheralTypes as $peripheralType)
+                                            <option value="{{ $peripheralType->id }}">
+                                                {{ $peripheralType->name }}
+                                            </option>
+                                        @endforeach
+                                    </x-adminlte-select>
 
-                </div>
+                                    <x-adminlte-select name="peripheral_brand_id" label="Marca" style="width: 100%">
+                                        @foreach ($brands as $brand)
+                                            <option value="{{ $brand->id }}">{{ $brand->name }}
+                                            </option>
+                                        @endforeach
+                                    </x-adminlte-select>
 
+                                    <x-adminlte-input name="peripheral_model" label="Modelo"
+                                        placeholder="Ingrese el modelo del periferico" />
+                                    <x-adminlte-input name="peripheral_serial_number" label="Numero de serie"
+                                        placeholder="Ingrese el numero de serie del periferico" />
+
+                                    <x-adminlte-button type="submit" label="Agregar Periferico" theme="success"
+                                        icon="fas fa-plus" />
+                                </form>
+                            </div>
+
+                            <hr>
+                            <div x-show="peripherals.length > 0" class="col-md-12">
+                                <x-adminlte-datatable id="peripheralTable" :heads="['Tipo', 'Marca', 'Modelo', 'Numero de Serie', 'Acciones']" :config="[
+                                    'searching' => false,
+                                    'paging' => false,
+                                    'info' => false,
+                                ]">
+                                    <template x-for="peripheral in peripherals" :key="peripheral.serial_number">
+                                        <tr>
+                                            <td x-text="peripheralTypes.find(pt => pt.id == peripheral.type_id).name">
+                                            </td>
+                                            <td x-text="brands.find(b => b.id == peripheral.brand_id).name">
+                                            </td>
+                                            <td x-text="peripheral.model"></td>
+                                            <td x-text="peripheral.serial_number"></td>
+                                            <td>
+                                                <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
+                                                    @click="removeperipheral(peripheral.serial_number)" />
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </x-adminlte-datatable>
+                            </div>
+                            <div class="row justify-content-between">
+                                <x-adminlte-button label="Regresar" theme="primary" icon="fas fa-arrow-left"
+                                    x-on:click="nextTab('user-tab')" />
+                                <x-adminlte-button label="Siguiente" theme="primary" icon="fas fa-arrow-right"
+                                    x-on:click="nextTab('features-tab')" />
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <form @submit.prevent="addFeature">
+                                        @csrf
+                                        <input type="hidden" name="type" value="pc">
+
+                                        <x-adminlte-select x-on:change="setAnswers" name="feature_id"
+                                            label="Caracteristicas" style="width: 100%">
+                                            @foreach ($features as $feature)
+                                                <option value="{{ $feature->id }}">
+                                                    {{ $feature->name }}</option>
+                                            @endforeach
+                                        </x-adminlte-select>
+
+                                        <div x-show="answers.length > 0">
+                                            <x-adminlte-select name="feature_value" id="feature_value"
+                                                label="Respuestas de la Caracteristica" style="width: 100%">
+                                                <template x-for="(answer, index) in answers" :key="index">
+                                                    <option x-text="answer"></option>
+                                                </template>
+                                            </x-adminlte-select>
+                                        </div>
+
+                                        <div x-show="answers.length == 0">
+                                            <x-adminlte-input name="feature_value" id="feature_value"
+                                                label="Valor de la Caracteristica"
+                                                placeholder="Ingrese el valor de la caracteristica" />
+                                        </div>
+                                        <x-adminlte-button type="submit" label="Agregar Caracteristicas" theme="success"
+                                            icon="fas fa-plus" />
+                                    </form>
+                                </div>
+
+                                <hr>
+                                <div x-show="newFeatures.length > 0" class="col-md-12">
+                                    <x-adminlte-datatable id="featureTable" :heads="['Caracteristica', 'Valor', 'Acciones']" :config="[
+                                        'searching' => false,
+                                        'paging' => false,
+                                        'info' => false,
+                                    ]">
+                                        <template x-for="feature in newFeatures" :key="feature.feature_id">
+                                            <tr>
+                                                <td x-text="fetures.find(f => f.id == feature.feature_id).name">
+                                                </td>
+                                                <td x-text="feature.value"></td>
+                                                <td>
+                                                    <x-adminlte-button class="btn-xs" theme="danger" icon="fas fa-trash"
+                                                        @click="removeFeature(feature.feature_id)" />
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </x-adminlte-datatable>
+                                </div>
+
+
+                            </div>
+                            <div class="row justify-content-between">
+                                <x-adminlte-button label="Regresar" theme="primary" icon="fas fa-arrow-left"
+                                    x-on:click="nextTab('peripherals-tab')" />
+                                <x-adminlte-button label="Siguiente" theme="primary" icon="fas fa-arrow-right"
+                                    x-on:click="nextTab('resume-tab')" />
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane fade" id="resume" role="tabpanel" aria-labelledby="resume-tab">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div x-show="brandId != null" class="col-md-6">
+                                            <span class="text-bold">Marca:</span>
+                                            <span x-text="brands.find(b => b.id == brandId)?.name"></span>
+                                        </div>
+                                        <div x-show="model != null" class="col-md-6">
+                                            <span class="text-bold">Modelo:</span>
+                                            <span x-text="model"></span>
+                                        </div>
+                                        <div x-show="serialNumber != null" class="col-md-6">
+                                            <span class="text-bold">Numero de serie:</span>
+                                            <span x-text="serialNumber"></span>
+                                        </div>
+                                        <div x-show="mac != null" class="col-md-6">
+                                            <span class="text-bold">Direccion MAC:</span>
+                                            <span x-text="mac"></span>
+                                        </div>
+                                        <div x-show="code != null" class="col-md-6">
+                                            <span class="text-bold">Sticker:</span>
+                                            <span x-text="code"></span>
+                                        </div>
+                                        <div x-show="operationSystemId != null" class="col-md-6">
+                                            <span class="text-bold">Sistema Operativo:</span>
+                                            <span
+                                                x-text="operationSystems.find(o => o.id == operationSystemId)?.name"></span>
+                                        </div>
+                                        <div x-show="selectedLocation != null" class="col-md-6">
+                                            <span class="text-bold">Ubicacion:</span>
+                                            <span x-text="selectedLocation"></span>
+                                        </div>
+                                        <div x-show="userId != null" class="col-md-6">
+                                            <span class="text-bold">Responsable:</span>
+                                            <span x-text="users.find(u => u.id == userId)?.employee.full_name"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div x-show="peripherals.length > 0" class="col-md-12">
+                                            <x-adminlte-datatable id="peripheralsTable" :heads="['Periferico']"
+                                                :config="[
+                                                    'searching' => false,
+                                                    'paging' => false,
+                                                    'info' => false,
+                                                ]">
+                                                <template x-for="peripheral in peripherals" :key="peripheral.id">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <span class="text-bold">Modelo:</span>
+                                                                    <span x-text="peripheral.model"></span>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <span class="text-bold">Serial:</span>
+                                                                    <span x-text="peripheral.serial_number"></span>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <span class="text-bold">Marca:</span>
+                                                                    <span
+                                                                        x-text="brands.find(b => b.id == peripheral.brand_id)?.name"></span>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <span class="text-bold">Tipo:</span>
+                                                                    <span
+                                                                        x-text="peripheralTypes.find(pt => pt.id == peripheral.type_id)?.name"></span>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <span class="text-bold">Sistema Operativo:</span>
+                                                                    <span
+                                                                        x-text="operationSystems.find(os => os.id == peripheral.operation_system_id)?.name"></span>
+                                                                </div>
+
+                                                            </div>
+                                                        </td>
+
+                                                    </tr>
+                                                </template>
+                                            </x-adminlte-datatable>
+                                        </div>
+                                        <div x-show="newFeatures.length > 0" class="col-md-12">
+                                            <x-adminlte-datatable id="featuresTable" :heads="['Caracteristica', 'Valor']" :config="[
+                                                'searching' => false,
+                                                'paging' => false,
+                                                'info' => false,
+                                            ]">
+                                                <template x-for="feature in newFeatures" :key="feature.feature_id">
+                                                    <tr>
+                                                        <td x-text="fetures.find(f => f.id == feature.feature_id).name">
+                                                        </td>
+                                                        <td x-text="feature.value"></td>
+                                                    </tr>
+                                                </template>
+                                            </x-adminlte-datatable>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="row justify-content-between">
+                                <x-adminlte-button label="Regresar" theme="primary" icon="fas fa-arrow-left"
+                                    x-on:click="nextTab('features-tab')" />
+                                <form
+                                    action="{{ $technicalSheet ? route('technicalSheet.update', $technicalSheet) : route('technicalSheet.store') }}"
+                                    method="POST">
+                                    @csrf
+                                    @if ($technicalSheet)
+                                        @method('PUT')
+                                        <input type="hidden" name="id" value="{{ $technicalSheet->id }}">
+                                    @endif
+                                    <input type="hidden" name="type" value="pc" />
+                                    <input type="hidden" name="peripherals[]" x-bind:value="peripheralsStr" />
+                                    <input type="hidden" name="features[]" x-bind:value="newFeaturesStr" />
+                                    <input type="hidden" name="assigned_to" x-bind:value="userId">
+                                    <input type="hidden" name="place" x-bind:value="selectedLocation">
+                                    <input type="hidden" name="model" x-bind:value="model">
+                                    <input type="hidden" name="serial_number" x-bind:value="serialNumber">
+                                    <input type="hidden" name="brand_id" x-bind:value="brandId">
+                                    <input type="hidden" name="operation_system_id" x-bind:value="operationSystemId">
+                                    <input type="hidden" name="mac" x-bind:value="mac">
+                                    <input type="hidden" name="code" x-bind:value="code">
+
+                                    <x-adminlte-button label="Guardar" theme="success" icon="fas fa-save"
+                                        type="submit" />
+                                </form>
+                            </div>
+                        </div>
+
+
+                    </x-slot>
+
+                </x-tab>
             </div>
-
         </div>
-
     </div>
 
 @endsection
@@ -203,10 +433,13 @@
 
 
 @section('js')
+    {{-- Datatable --}}
+    {{-- <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script> --}}
     {{-- Sweetalert --}}
     <script src="{{ asset('vendor/sweetalert2/sweetalert2.js') }}"></script>
     {{-- Alpine --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 
 
     @php
@@ -218,6 +451,18 @@
             'features',
             json_encode($technicalSheet?->technicalSheetable?->featureValues?->toArray() ?? []),
         );
+        $model = old('model', $technicalSheet?->technicalSheetable?->model ?? '');
+        $serialNumber = old('serial_number', $technicalSheet?->technicalSheetable?->serial_number ?? '');
+        $mac = old('mac', $technicalSheet?->technicalSheetable?->mac ?? '');
+        $operationSystemId = old(
+            'operation_system_id',
+            $technicalSheet?->technicalSheetable?->operation_system_id ?? 1,
+        );
+        $brandId = old('brand_id', $technicalSheet?->technicalSheetable?->brand_id ?? 1);
+        $code = old('code', $technicalSheet?->technicalSheetable?->code);
+        $userId = old('user_id', $technicalSheet?->assigned_to ?? 1);
+        $location = old('place', $technicalSheet?->place ?? config('locations')[0]);
+
     @endphp
 
 
@@ -231,6 +476,7 @@
             });
         };
 
+
         function data() {
             let peripherals = @json($oldPeripherals);
             peripherals = peripherals.toString();
@@ -239,21 +485,40 @@
             newFeatures = newFeatures.toString();
             newFeatures = newFeatures ? JSON.parse(newFeatures) : [];
 
-            console.log('Peripherals:', peripherals);
-            console.log('New Features:', newFeatures);
+
             return {
+                model: "{{ $model }}",
+                serialNumber: "{{ $serialNumber }}",
+                mac: "{{ $mac }}",
+                operationSystemId: "{{ $operationSystemId }}",
+                brandId: "{{ $brandId }}",
+                code: "{{ $code }}",
+                userId: "{{ $userId }}",
+
+                users: @json($users),
+                locations: @json($locations),
+                selectedLocation: "{{ $location }}",
                 brands: @json($brands),
                 answers: [],
                 peripheralTypes: @json($peripheralTypes),
                 peripherals,
                 peripheralsStr: JSON.stringify(peripherals),
+                operationSystems: @json($operatingSystems),
                 fetures: @json($features),
                 newFeaturesStr: JSON.stringify(newFeatures),
                 newFeatures,
+
+                nextTab(tab) {
+                    $(`#${tab}`).removeClass('disabled');
+                    $(`#${tab}`).click();
+                    $(`#${tab}`).addClass('disabled');
+                },
+
                 removeFeature(featureId) {
                     this.newFeatures = this.newFeatures.filter(f => f.feature_id !== featureId);
                     this.newFeaturesJson = JSON.stringify(this.newFeatures);
                 },
+
                 addFeature(e) {
                     e.preventDefault();
                     const featureId = document.querySelector('select[name="feature_id"]').value;

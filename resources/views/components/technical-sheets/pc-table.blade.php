@@ -19,13 +19,11 @@
                         onclick="window.location.href='{{ route('technicalSheet.show', $technicalSheet->id) }}'" />
                     <form action="{{ route('technicalSheet.edit', $technicalSheet->id) }}" method="GET"
                         style="display: inline;">
-                        @csrf
                         <input type="hidden" name="type" value="pc" />
                         <x-adminlte-button class="btn btn-primary" icon="fas fa-edit" type="submit" />
                     </form>
                     <form action="{{ route('technicalSheet.destroy', $technicalSheet->id) }}" method="POST"
                         style="display: inline;">
-                        @csrf
                         @method('DELETE')
                         <x-adminlte-button class="btn btn-danger" icon="fas fa-trash"
                             onclick="return confirm('¿Estás seguro de eliminar esta ficha técnica?')" />

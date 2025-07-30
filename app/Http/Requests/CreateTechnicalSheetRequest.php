@@ -11,6 +11,7 @@ use App\Models\PeripheralType;
 use App\Models\Printer;
 use App\Models\Scanner;
 use App\Models\TechnicalSheet;
+use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -36,10 +37,10 @@ class CreateTechnicalSheetRequest extends FormRequest
             'peripherals.*.model' => ['required', 'string', 'max:100'],
             'peripherals.*.serial_number' => ['required', 'string', 'max:100'],
             'operation_system_id' => ['required_if:type,pc', 'exists:' . OperationSystem::class . ',id'],
-            'model' => ['required', 'string', 'max:100'],
-            'serial_number' => ['required', 'string', 'max:100'],
-            'code' => ['required', 'numeric', 'min:1', 'unique:' . Device::class . ',code'],
-            'mac' => ['required', 'string', 'max:100', 'unique:' . Device::class . ',mac'],
+            'model' => ['required_if:type,pc', 'string', 'max:100'],
+            'serial_number' => ['required_if:type,pc', 'string', 'max:100'],
+            'assigned_to' => ['nullable', 'exists:' . User::class . ',id'],
+            'place' => ['nullable', 'string', 'max:255', 'in:' . implode(',', config('locations'))],
         ];
     }
 

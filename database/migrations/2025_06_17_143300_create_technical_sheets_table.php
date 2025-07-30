@@ -15,8 +15,14 @@ return new class extends Migration
             $table->id();
             $table->morphs('technical_sheetable', 'technical_sheetable_index');
             $table->integer('user_id')->nullable();
+            $table->integer('assigned_to')->nullable();
+            $table->string('place')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on(env('DB_TIMEIT_DATABASE') . '.usuarios')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
+
+            $table->foreign('assigned_to')->references('id')->on(env('DB_TIMEIT_DATABASE') . '.usuarios')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
         });
